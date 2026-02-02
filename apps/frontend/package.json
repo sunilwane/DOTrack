@@ -13,6 +13,7 @@
     "@heroui/react": "^2.8.8",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-router-dom": "^7.13.0",
     "types": "workspace:*"
   },
   "devDependencies": {
