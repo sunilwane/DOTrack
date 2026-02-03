@@ -1,19 +1,44 @@
-import { ReactNode } from "react";
-import Sidebar  from "./Sidebar";
-import  Topbar  from "./Topbar";
+import { Outlet, Link } from "react-router-dom";
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Button } from "@heroui/react";
 
-interface Props {
-  children: ReactNode;
-}
-
-export const AppLayout = ({ children }: Props) => {
+export const AppLayout = () => {
   return (
-    <div style={{ display: "flex", height: "100vh" }}>
-      <Sidebar />
-      <div style={{ flex: 1 }}>
-        <Topbar />
-        <main style={{ padding: "24px" }}>{children}</main>
-      </div>
+    <div className="min-h-screen flex flex-col">
+
+      <Navbar isBordered>
+
+        <NavbarBrand>
+          <p className="font-bold text-xl">Nexus</p>
+        </NavbarBrand>
+
+        <NavbarContent justify="center">
+
+          <NavbarItem>
+            <Link to="/dashboard">Dashboard</Link>
+          </NavbarItem>
+
+          <NavbarItem>
+            <Link to="/projects">Projects</Link>
+          </NavbarItem>
+
+          <NavbarItem>
+            <Link to="/deployments">Deployments</Link>
+          </NavbarItem>
+
+        </NavbarContent>
+
+        <NavbarContent justify="end">
+          <Button color="primary" variant="flat">
+            Wallet
+          </Button>
+        </NavbarContent>
+
+      </Navbar>
+
+      <main className="flex-1 p-6 bg-gray-50 dark:bg-black">
+        <Outlet />
+      </main>
+
     </div>
   );
 };
