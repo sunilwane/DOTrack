@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
-import Sidebar  from "./Sidebar";
-import  Topbar  from "./Topbar";
+import Sidebar from "./Sidebar";
+import Topbar from "./Topbar";
 
 interface Props {
   children: ReactNode;
@@ -8,12 +8,12 @@ interface Props {
 
 export const AppLayout = ({ children }: Props) => {
   return (
-    <div style={{ display: "flex", height: "100vh" }}>
+    <div className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark">
       <Sidebar />
-      <div style={{ flex: 1 }}>
+      <main className="flex-1 overflow-y-auto">
         <Topbar />
-        <main style={{ padding: "24px" }}>{children}</main>
-      </div>
+        {children}
+      </main>
     </div>
   );
 };
