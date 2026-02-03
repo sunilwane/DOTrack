@@ -1,8 +1,7 @@
 /* Tailwind CSS v4 Import */
 @import "tailwindcss";
 
-/* Google Fonts Import - Moved to index.html for better performance */
-/* Material Symbols Icons - Moved to index.html for better performance */
+/* Google Fonts & Material Symbols Imports moved to index.html for performance */
 
 /* Custom Tailwind Theme Configuration */
 @theme {
@@ -16,24 +15,28 @@
   --font-display: 'Space Grotesk', sans-serif;
 
   /* Border Radius */
-  --radius-DEFAULT: 0.25rem;
+  --radius-default: 0.25rem;
+  /* Standardized to lowercase 'default' */
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;
   --radius-full: 9999px;
+
+  /* Breakpoints from main */
+  --breakpoint-xs: 480px;
 }
 
 /* ========================================
-   ORIGINAL VITE CSS (PRESERVED)
+   ORIGINAL VITE CSS + MAIN UPDATES
    ======================================== */
 
 :root {
-  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-family: var(--font-display);
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: var(--color-background-dark);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -41,10 +44,22 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined' !important;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  display: inline-block;
+  line-height: 1;
+}
+
+/* Styles from Main */
+.node-bg {
+  background-image: radial-gradient(circle at 2px 2px, rgba(13, 89, 242, 0.15) 1px, transparent 0);
+  background-size: 40px 40px;
+}
+
+.glass-card {
+  background: rgba(27, 31, 39, 0.7);
+  backdrop-filter: blur(10px);
 }
 
 a:hover {
@@ -54,14 +69,13 @@ a:hover {
 body {
   margin: 0;
   display: block;
-  /* Changed from flex to allow full width */
+  /* From HEAD: allow full width */
   min-width: 320px;
   min-height: 100vh;
-  font-family: 'Space Grotesk', sans-serif;
+  /* font-family is set in :root */
 }
 
-/* h1 rule removed to allow utility classes to work */
-
+/* Button styles from HEAD (Dashboard) */
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -85,7 +99,7 @@ button:focus-visible {
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
-    background-color: #ffffff;
+    background-color: var(--color-background-light);
   }
 
   a:hover {
@@ -106,23 +120,4 @@ button:focus-visible {
   background: rgba(40, 46, 57, 0.4);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-/* Material Icons Default Style */
-.material-symbols-outlined {
-  font-family: 'Material Symbols Outlined';
-  font-weight: normal;
-  font-style: normal;
-  font-size: 24px;
-  line-height: 1;
-  letter-spacing: normal;
-  text-transform: none;
-  display: inline-block;
-  white-space: nowrap;
-  word-wrap: normal;
-  direction: ltr;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  font-feature-settings: 'liga';
 }

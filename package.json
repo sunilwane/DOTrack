@@ -11,5 +11,10 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.13.1"
+  "packageManager": "pnpm@10.13.1",
+  "dependencies": {
+    "@heroui/react": "^2.8.8",
+    "framer-motion": "^12.30.0",
+    "material-symbols": "^0.40.2"
+  }
 }
