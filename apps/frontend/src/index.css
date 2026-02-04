@@ -1,15 +1,33 @@
+/* Tailwind CSS v4 Import */
 @import "tailwindcss";
 
+/* Google Fonts & Material Symbols Imports moved to index.html for performance */
+
+/* Custom Tailwind Theme Configuration */
 @theme {
+  /* Custom Colors */
   --color-primary: #0d59f2;
   --color-background-light: #f5f6f8;
   --color-background-dark: #101622;
-  --font-display: "Space Grotesk", sans-serif;
+  --color-accent-emerald: #10b981;
+
+  /* Font Family */
+  --font-display: 'Space Grotesk', sans-serif;
+
+  /* Border Radius */
   --radius-default: 0.25rem;
+  /* Standardized to lowercase 'default' */
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;
+  --radius-full: 9999px;
+
+  /* Breakpoints from main */
   --breakpoint-xs: 480px;
 }
+
+/* ========================================
+   ORIGINAL VITE CSS + MAIN UPDATES
+   ======================================== */
 
 :root {
   font-family: var(--font-display);
@@ -30,8 +48,10 @@
   font-family: 'Material Symbols Outlined' !important;
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   display: inline-block;
+  line-height: 1;
 }
 
+/* Styles from Main */
 .node-bg {
   background-image: radial-gradient(circle at 2px 2px, rgba(13, 89, 242, 0.15) 1px, transparent 0);
   background-size: 40px 40px;
@@ -42,9 +62,38 @@
   backdrop-filter: blur(10px);
 }
 
+a:hover {
+  color: #535bf2;
+}
+
 body {
   margin: 0;
+  display: block;
+  /* From HEAD: allow full width */
+  min-width: 320px;
   min-height: 100vh;
+  /* font-family is set in :root */
+}
+
+/* Button styles from HEAD (Dashboard) */
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+button:hover {
+  border-color: #646cff;
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
 }
 
 @media (prefers-color-scheme: light) {
@@ -52,4 +101,23 @@ body {
     color: #213547;
     background-color: var(--color-background-light);
   }
+
+  a:hover {
+    color: #747bff;
+  }
+
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+/* ========================================
+   CUSTOM STYLES FOR WEB3 DASHBOARD
+   ======================================== */
+
+/* Glass Panel Effect */
+.glass-panel {
+  background: rgba(40, 46, 57, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
