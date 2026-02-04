@@ -1,6 +1,24 @@
 /* Tailwind CSS v4 Import */
 @import "tailwindcss";
 
+/* Custom Sleek Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
 /* Google Fonts & Material Symbols Imports moved to index.html for performance */
 
 /* Custom Tailwind Theme Configuration */
@@ -10,6 +28,14 @@
   --color-background-light: #f5f6f8;
   --color-background-dark: #101622;
   --color-accent-emerald: #10b981;
+
+  /* Nexus Branded Colors from Image */
+  --color-nexus-bg: #0a0b10;
+  --color-nexus-card: #161b22;
+  --color-nexus-primary: #3b82f6;
+  --color-nexus-success: #10b981;
+  --color-nexus-purple: #a855f7;
+  --color-nexus-border: #282e39;
 
   /* Font Family */
   --font-display: 'Space Grotesk', sans-serif;

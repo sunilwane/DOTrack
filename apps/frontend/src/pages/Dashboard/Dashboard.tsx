@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 
 const Dashboard = () => {
-    // Pipeline Animation State
     const [stages, setStages] = useState([
         { id: 1, label: "Build", time: "Pending", status: "pending", icon: "check" },
         { id: 2, label: "Test Suite", time: "Pending", status: "pending", icon: "check" },
@@ -14,17 +13,14 @@ const Dashboard = () => {
         let currentStageIndex = 0;
 
         const runAnimation = () => {
-            // Reset to initial state
             setStages(prev => prev.map(s => ({ ...s, status: "pending", time: "Pending", icon: s.id === 3 ? "verified_user" : s.id === 4 ? "pen_size_2" : s.id === 5 ? "rocket_launch" : "check" })));
 
             const interval = setInterval(() => {
                 setStages(prev => {
                     const newStages = [...prev];
 
-                    // If we're past the last stage, stop (or loop)
                     if (currentStageIndex >= newStages.length) {
                         clearInterval(interval);
-                        // Optional: Restart animation after a delay
                         setTimeout(() => {
                             currentStageIndex = 0;
                             runAnimation();
@@ -32,28 +28,23 @@ const Dashboard = () => {
                         return newStages;
                     }
 
-                    // Mark previous stage as done
                     if (currentStageIndex > 0) {
                         newStages[currentStageIndex - 1].status = "done";
                         newStages[currentStageIndex - 1].time = "Just now";
-                        // Restore original icon if needed, or keep check
                         newStages[currentStageIndex - 1].icon = "check";
                         if (currentStageIndex - 1 === 2) newStages[currentStageIndex - 1].icon = "verified_user";
                     }
 
-                    // Mark current stage as active
                     if (newStages[currentStageIndex]) {
-                        // Stop at On-Chain Gate (index 3) to simulate waiting for user
                         if (currentStageIndex === 3) {
                             newStages[currentStageIndex].status = "active";
                             newStages[currentStageIndex].time = "Pending Signature";
-                            newStages[currentStageIndex].icon = "pen_size_2"; // Static icon for waiting state
-                            // Clear interval to hold state here
+                            newStages[currentStageIndex].icon = "pen_size_2";
                             clearInterval(interval);
                         } else {
                             newStages[currentStageIndex].status = "active";
                             newStages[currentStageIndex].time = "Running...";
-                            newStages[currentStageIndex].icon = "progress_activity"; // Loading spinner
+                            newStages[currentStageIndex].icon = "progress_activity";
                         }
                     }
 
@@ -61,18 +52,17 @@ const Dashboard = () => {
                 });
 
                 currentStageIndex++;
-            }, 3000); // Transition every 3 seconds
+            }, 3000);
         };
 
         runAnimation();
 
-        return () => { }; // Cleanup not strictly necessary for this simple demo but good practice
+        return () => { };
     }, []);
 
     return (
         <div className="flex flex-col min-h-full">
             <div className="p-8 mx-auto flex-1 w-full">
-                {/* PageHeading */}
                 <div className="flex flex-wrap justify-between items-end gap-6 bg-primary/5 p-2 rounded-xl border border-primary/10">
                     <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-3">
@@ -106,7 +96,6 @@ const Dashboard = () => {
                 </div>
 
                 <div style={{ width: '80%' }} className="grid grid-cols-4 lg:grid-cols-3 gap-5 mt-8">
-                    {/* Pipeline Status Visual Tracker */}
                     <div className="lg:col-span-2 space-y-4">
                         <div className="flex items-center justify-between">
                             <h3 style={{ fontSize: '0.8em' }} className="text-slate-900 dark:text-white  font-bold flex items-center gap-2">
@@ -117,11 +106,9 @@ const Dashboard = () => {
                         </div>
                         <div className="bg-white dark:bg-[#161d2b] p-8 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl">
                             <div className="flex items-center justify-between relative">
-                                {/* Background Line */}
                                 <div className="absolute top-1/2 left-0 w-full h-1 bg-slate-200 dark:bg-slate-700 -translate-y-1/2 z-0"></div>
                                 <div className="absolute top-1/2 left-0 w-3/4 h-1 bg-primary -translate-y-1/2 z-0"></div>
 
-                                {/* Stages */}
                                 {stages.map((stage, index) => (
                                     <div key={index} className={`relative z-10 flex flex-col items-center gap-3 ${stage.status === 'pending' ? 'opacity-40' : ''} transition-all duration-700 ease-in-out`}>
                                         <div
@@ -150,7 +137,6 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    {/* Approval Center Widget */}
                     <div style={{ width: '180%' }} className="space-y-4 ">
                         <h3 style={{ fontSize: '0.8em' }} className="text-slate-900 dark:text-white  font-bold flex items-center gap-2">
                             <span className="material-symbols-outlined text-primary">gavel</span>
@@ -189,7 +175,6 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                {/* Recent Deployments Table */}
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
                         <h3 style={{ fontSize: '0.8em' }} className="text-slate-900 dark:text-white font-bold flex items-center gap-2">
@@ -242,7 +227,6 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Footer Status Bar */}
             <footer className="mt-auto border-t border-slate-200 dark:border-slate-800 px-8 py-3 bg-white dark:bg-slate-900 flex justify-between items-center text-[10px] font-bold tracking-widest text-slate-500 uppercase">
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1.5">
