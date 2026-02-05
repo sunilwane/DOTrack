@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Logo } from "../common/Logo";
 import { Button } from "../common/Button";
 
@@ -47,7 +47,7 @@ export const PublicHeader: React.FC = () => {
                                         <span className="text-sm font-bold">Connect Wallet</span>
                                     </div>
                                 </DropdownItem>
-                                <DropdownItem key="features" textValue="Features" onClick={() => navigate("/features")}>
+                                <DropdownItem key="features" textValue="Features" onClick={() => navigate("/")}>
                                     <div className="flex items-center gap-3">
                                         <span className="material-symbols-outlined text-[20px] opacity-60">layers</span>
                                         <span className="text-sm">Features</span>
@@ -59,7 +59,7 @@ export const PublicHeader: React.FC = () => {
                                         <span className="text-sm">Marketplace</span>
                                     </div>
                                 </DropdownItem>
-                                <DropdownItem key="docs" textValue="Docs" onClick={() => navigate("/docs")}>
+                                <DropdownItem key="docs" textValue="Docs" onClick={() => navigate("/")}>
                                     <div className="flex items-center gap-3">
                                         <span className="material-symbols-outlined text-[20px] opacity-60">description</span>
                                         <span className="text-sm">Documentation</span>
@@ -109,7 +109,7 @@ export const PublicHeader: React.FC = () => {
 };
 
 const NavLink: React.FC<{ href: string; children: React.ReactNode }> = ({ href, children }) => (
-    <a className="text-sm font-medium hover:text-primary transition-colors shrink-0" href={href}>
+    <Link className="text-sm font-medium hover:text-primary transition-colors shrink-0" to={href}>
         {children}
-    </a>
+    </Link>
 );
