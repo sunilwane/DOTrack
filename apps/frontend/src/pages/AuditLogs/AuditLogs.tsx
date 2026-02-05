@@ -1,19 +1,8 @@
 import * as React from "react";
-import {
-    Card,
-    CardBody,
-    Button,
-    Chip,
-    Table,
-    TableHeader,
-    TableColumn,
-    TableBody,
-    TableRow,
-    TableCell,
-} from "@heroui/react";
+import { Button } from "../../Components/common/Button";
 import Pagination from "../../Components/common/Pagination";
-import StatsGrid, { StatItem } from "../../Components/common/StatsGrid";
-import AuditTable, { AuditEntry } from "../../Components/common/TableComp";
+import StatsGrid, { type StatItem } from "../../Components/common/StatsGrid";
+import AuditTable, { type AuditEntry } from "../../Components/common/TableComp";
 
 import { Rocket, Shield, Database } from "lucide-react";
 
@@ -93,7 +82,7 @@ const AuditDashboard: React.FC = () => {
                 <StatsGrid stats={stats} />
 
                 <div className="flex justify-end">
-                    <Button color="success" variant="flat">
+                    <Button variant="primary">
                         Verify All Records
                     </Button>
                 </div>
