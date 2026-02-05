@@ -1,18 +1,26 @@
-import { ReactNode } from "react";
-import Sidebar  from "./Sidebar";
-import  Topbar  from "./Topbar";
+import { useState } from "react";
+import { Outlet } from "react-router-dom";
+import Sidebar from "../common/Sidebar";
+import Topbar from "../common/Topbar";
+import { Scroller } from "../common/Scroller";
 
-interface Props {
-  children: ReactNode;
-}
+export const AppLayout = () => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-export const AppLayout = ({ children }: Props) => {
   return (
-    <div style={{ display: "flex", height: "100vh" }}>
-      <Sidebar />
-      <div style={{ flex: 1 }}>
+    <div className="flex bg-background-light dark:bg-background-dark h-screen overflow-hidden">
+      <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+      <div className={`flex-1 flex flex-col h-screen transition-all duration-300 ${isCollapsed ? 'ml-20' : 'ml-64'}`}>
         <Topbar />
-        <main style={{ padding: "24px" }}>{children}</main>
+        <Scroller 
+          className="flex-1" 
+          direction="vertical" 
+          scrollbarStyle="thin"
+          lerp={0.04}
+          duration={1.8}
+        >
+          <Outlet />
+        </Scroller>
       </div>
     </div>
   );
