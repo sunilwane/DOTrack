@@ -2,6 +2,7 @@ import * as React from "react";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Logo } from '../common/Logo';
 import { Button } from '../common/Button';
+import { Scroller } from '../common/Scroller';
 import ProjectFilter from '../../pages/AuditLogs/ProjectFilter';
 
 interface NavItem {
@@ -45,7 +46,8 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
 
         return (
             <div key={item.id} className="flex flex-col gap-1">
-                <div
+                <button
+                    type="button"
                     onClick={() => {
                         if (item.id === 'audit' && location.pathname === '/audit-logs') {
                             setIsAuditExpanded(!isAuditExpanded);
@@ -53,13 +55,14 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                         navigate(item.path);
                     }}
                     className={`
-                        flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all cursor-pointer group
+                        flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all cursor-pointer group w-full
                         ${isCurrentlyActive
                             ? 'bg-primary/10 text-primary border border-primary/20 shadow-lg shadow-primary/5'
                             : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
                         }
                         ${isCollapsed ? 'justify-center px-0' : ''}
                     `}
+                    aria-current={isCurrentlyActive ? 'page' : undefined}
                 >
                     <span
                         className="material-symbols-outlined transition-transform group-hover:scale-110"
@@ -68,7 +71,7 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                         {item.icon}
                     </span>
                     {!isCollapsed && <p className="text-sm font-bold whitespace-nowrap">{item.label}</p>}
-                </div>
+                </button>
 
                 {item.id === 'audit' && (
                     <div className={`grid transition-all duration-300 ease-in-out ${isAuditExpanded && !isCollapsed ? 'grid-rows-[1fr] opacity-100 mt-2' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
@@ -87,7 +90,12 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
             <div className="flex flex-col gap-10 flex-1 min-h-0">
                 {/* Logo & Toggle */}
                 <div className={`flex items-center ${isCollapsed ? 'flex-col justify-center gap-4' : 'justify-between'} px-2 overflow-hidden transition-all duration-300`}>
-                    <div className={`flex items-center gap-3 ${isCollapsed ? 'hidden' : 'flex'} cursor-pointer`} onClick={() => navigate("/")}>
+                    <button
+                        type="button"
+                        className={`flex items-center gap-3 ${isCollapsed ? 'hidden' : 'flex'} cursor-pointer bg-transparent border-none p-0 text-left`}
+                        onClick={() => navigate("/")}
+                        aria-label="Navigate to home"
+                    >
                         <Logo className="size-9 text-primary shrink-0" />
                         <div className="flex flex-col whitespace-nowrap overflow-hidden">
                             <h1 className="text-white text-sm font-bold leading-none tracking-tight">Nexus CI/CD</h1>
@@ -95,12 +103,17 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                                 Web3 DevOps
                             </p>
                         </div>
-                    </div>
+                    </button>
 
                     {isCollapsed && (
-                        <div className="cursor-pointer" onClick={() => navigate("/")}>
+                        <button
+                            type="button"
+                            className="cursor-pointer bg-transparent border-none p-0"
+                            onClick={() => navigate("/")}
+                            aria-label="Navigate to home"
+                        >
                             <Logo className="size-9 text-primary shrink-0" />
-                        </div>
+                        </button>
                     )}
 
                     <button
@@ -112,11 +125,13 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                 </div>
 
                 {/* Navigation Menu */}
-                <nav className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
-                    <div className="flex flex-col gap-1">
-                        {navItems.map(renderNavItem)}
-                    </div>
-                </nav>
+                <Scroller className="flex-1" direction="vertical" scrollbarStyle="thin">
+                    <nav>
+                        <div className="flex flex-col gap-1">
+                            {navItems.map(renderNavItem)}
+                        </div>
+                    </nav>
+                </Scroller>
             </div>
 
             {/* Bottom Section */}
@@ -150,19 +165,25 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
 
                 {/* Footer Links */}
                 <div className={`flex flex-col gap-1 border-t border-white/5 pt-2 ${isCollapsed ? 'items-center' : ''}`}>
-                    <SidebarLink icon="menu_book" label="Docs" collapsed={isCollapsed} />
-                    <SidebarLink icon="support" label="Support" collapsed={isCollapsed} />
+                    <SidebarLink icon="menu_book" label="Docs" collapsed={isCollapsed} onClick={() => window.open('https://docs.example.com', '_blank')} />
+                    <SidebarLink icon="support" label="Support" collapsed={isCollapsed} onClick={() => window.open('https://support.example.com', '_blank')} />
                 </div>
             </div>
         </aside>
     );
 }
 
-const SidebarLink: React.FC<{ icon: string; label: string; collapsed: boolean }> = ({ icon, label, collapsed }) => (
-    <div className={`flex items-center gap-3 px-3 py-2 text-slate-400 hover:text-white cursor-pointer transition-colors group ${collapsed ? 'justify-center px-0' : ''}`} title={label}>
+const SidebarLink: React.FC<{ icon: string; label: string; collapsed: boolean; onClick?: () => void }> = ({ icon, label, collapsed, onClick }) => (
+    <button
+        type="button"
+        onClick={onClick}
+        className={`flex items-center gap-3 px-3 py-2 text-slate-400 hover:text-white cursor-pointer transition-colors group w-full ${collapsed ? 'justify-center px-0' : ''}`}
+        title={label}
+        aria-label={label}
+    >
         <span className="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">{icon}</span>
         {!collapsed && <p className="text-xs font-bold uppercase tracking-widest">{label}</p>}
-    </div>
+    </button>
 );
 
 export default Sidebar;

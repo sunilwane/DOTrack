@@ -25,7 +25,12 @@ function Topbar() {
                 </label>
 
                 {/* New Pipeline Button */}
-                <Button variant="secondary" size="md" icon={<span className="material-symbols-outlined">add_circle</span>}>
+                <Button 
+                    variant="secondary" 
+                    size="md" 
+                    icon={<span className="material-symbols-outlined" aria-hidden="true">add_circle</span>}
+                    aria-label="New Pipeline"
+                >
                     <span className="hidden sm:inline">New Pipeline</span>
                 </Button>
 

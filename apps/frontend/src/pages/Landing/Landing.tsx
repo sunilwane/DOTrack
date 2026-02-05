@@ -1,6 +1,6 @@
 import * as React from "react";
 import { PublicHeader } from "../../Components/layout/PublicHeader";
-import { SmoothScrollProvider } from "../../Components/layout/SmoothScrollProvider";
+import { Scroller } from "../../Components/common/Scroller";
 import { HeroSection } from "../../Components/common/LandingPageComp/HeroSection";
 import { StatsSection } from "../../Components/common/LandingPageComp/StatsSection";
 import { ComparisonSection } from "../../Components/common/LandingPageComp/ComparisonSection";
@@ -10,8 +10,15 @@ import { LandingFooter } from "../../Components/common/LandingPageComp/LandingFo
 
 const Landing: React.FC = () => {
   return (
-    <SmoothScrollProvider>
-      <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-background-light dark:bg-background-dark text-slate-900 dark:text-white transition-colors duration-300">
+    <Scroller 
+      className="relative min-h-screen w-full bg-background-light dark:bg-background-dark text-slate-900 dark:text-white transition-colors duration-300" 
+      direction="vertical" 
+      scrollbarStyle="thin"
+      root={true}
+      lerp={0.06}
+      duration={1.5}
+    >
+      <div className="flex flex-col overflow-x-hidden">
         <PublicHeader />
 
         <main className="flex-1 flex flex-col items-center">
@@ -24,7 +31,7 @@ const Landing: React.FC = () => {
 
         <LandingFooter />
       </div>
-    </SmoothScrollProvider>
+    </Scroller>
   );
 };
 

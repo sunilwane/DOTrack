@@ -1,6 +1,6 @@
 import * as React from "react";
 import { AuthLayout } from "../../Components/layout/AuthLayout";
-import { SmoothScrollProvider } from "../../Components/layout/SmoothScrollProvider";
+
 import { WalletOptions } from "../../mock/PagesMockData/WalletData";
 import type { WalletOption as WalletOptionType } from "types";
 
@@ -10,7 +10,7 @@ const ConnectWallet: React.FC = () => {
     const isPolygonMainnet = false; // Replace with actual network check
 
     return (
-        <SmoothScrollProvider>
+       
             <AuthLayout
                 title="Connect Your Wallet"
                 description="Join the Decentralized CI/CD Ecosystem for Open-Source projects"
@@ -62,7 +62,7 @@ const ConnectWallet: React.FC = () => {
                     </p>
                 </div>
             </AuthLayout>
-        </SmoothScrollProvider>
+
     );
 };
 
