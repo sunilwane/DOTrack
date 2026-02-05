@@ -3,8 +3,12 @@ import { StatusBadge } from "../common/StatusBadge";
 
 function Topbar() {
     return (
+<<<<<<< HEAD:apps/frontend/src/Components/layout/Topbar.tsx
         <header className="flex items-center justify-between sticky top-0 z-40 border-b border-slate-200 dark:border-slate-800 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-6 sm:px-8 py-4">
             {/* Left Side: Title & Badge */}
+=======
+        <header className="flex items-center justify-between sticky top-0 z-10 border-b border-slate-200 dark:border-slate-800 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-8 py-4">
+>>>>>>> 06208e11d80f527e765229f62409c1606dac0376:apps/frontend/src/Components/common/Topbar.tsx
             <div className="flex items-center gap-6">
                 <h2 className="text-slate-900 dark:text-white font-bold text-sm tracking-tight uppercase tracking-wider">Project Overview</h2>
                 <div className="hidden sm:block h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
@@ -14,10 +18,13 @@ function Topbar() {
                 </div>
             </div>
 
-            {/* Right Side: Search, Actions, Profile */}
             <div className="flex items-center gap-4">
+<<<<<<< HEAD:apps/frontend/src/Components/layout/Topbar.tsx
                 {/* Search Bar */}
                 <label className="relative hidden md:flex items-center">
+=======
+                <label className="relative flex items-center">
+>>>>>>> 06208e11d80f527e765229f62409c1606dac0376:apps/frontend/src/Components/common/Topbar.tsx
                     <span className="material-symbols-outlined absolute left-3 text-slate-500 text-lg">
                         search
                     </span>
@@ -27,6 +34,7 @@ function Topbar() {
                     />
                 </label>
 
+<<<<<<< HEAD:apps/frontend/src/Components/layout/Topbar.tsx
                 {/* New Pipeline Button */}
                 <Button variant="secondary" size="md" icon={<span className="material-symbols-outlined">add_circle</span>}>
                     <span className="hidden sm:inline">New Pipeline</span>
@@ -34,6 +42,14 @@ function Topbar() {
 
                 {/* User Profile */}
                 <div className="size-10 rounded-full border-2 border-primary p-0.5 cursor-pointer hover:scale-105 transition-transform">
+=======
+                <button style={{fontSize: '0.8em'}} className="flex items-center justify-center rounded-lg h-10 px-4 bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors cursor-pointer border-none">
+                    <span className="material-symbols-outlined mr-2">add_circle</span>
+                    <span>New Pipeline</span>
+                </button>
+
+                <div className="size-10 rounded-full border-2 border-primary p-0.5 cursor-pointer">
+>>>>>>> 06208e11d80f527e765229f62409c1606dac0376:apps/frontend/src/Components/common/Topbar.tsx
                     <div
                         className="w-full h-full rounded-full bg-center bg-cover bg-slate-800"
                         style={{

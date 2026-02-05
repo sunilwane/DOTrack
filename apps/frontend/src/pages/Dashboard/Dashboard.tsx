@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
 import { StatusBadge } from '../../Components/common/StatusBadge';
-import { DashboardCard } from '../../Components/common/DashboardCard';
 import { Button } from '../../Components/common/Button';
+import { DashboardCard } from '../../Components/common/DashboardCard';
 
 const Dashboard = () => {
-    // Pipeline Animation State
     const [stages, setStages] = useState([
         { id: 1, label: "Build", time: "Pending", status: "pending", icon: "check" },
         { id: 2, label: "Test Suite", time: "Pending", status: "pending", icon: "check" },
@@ -15,48 +14,64 @@ const Dashboard = () => {
 
     useEffect(() => {
         let currentStageIndex = 0;
+        let interval: any;
 
-        const interval = setInterval(() => {
-            setStages(prev => {
-                const newStages = [...prev];
+        const runAnimation = () => {
+            // Reset stages
+            setStages(prev => prev.map(s => ({
+                ...s,
+                status: "pending",
+                time: s.id === 5 ? "Queued" : "Pending",
+                icon: s.id === 3 ? "verified_user" : s.id === 4 ? "pen_size_2" : s.id === 5 ? "rocket_launch" : "check"
+            })));
+            currentStageIndex = 0;
 
-                // Mark previous stage as done
-                if (currentStageIndex > 0) {
-                    newStages[currentStageIndex - 1].status = "done";
-                    newStages[currentStageIndex - 1].time = "Just now";
-                    newStages[currentStageIndex - 1].icon = "check";
-                    if (newStages[currentStageIndex - 1].id === 3) newStages[currentStageIndex - 1].icon = "verified_user";
-                }
+            interval = setInterval(() => {
+                setStages(prev => {
+                    const newStages = [...prev];
 
-                // If we've reached the end, stop here
-                if (currentStageIndex >= newStages.length) {
-                    clearInterval(interval);
-                    return prev; // No changes needed
-                }
-
-                // Mark current stage as active
-                if (newStages[currentStageIndex]) {
-                    if (currentStageIndex === 3) {
-                        newStages[currentStageIndex].status = "active";
-                        newStages[currentStageIndex].time = "Pending Signature";
-                        newStages[currentStageIndex].icon = "pen_size_2";
-                    } else {
-                        newStages[currentStageIndex].status = "active";
-                        newStages[currentStageIndex].time = "Running...";
-                        newStages[currentStageIndex].icon = "progress_activity";
+                    // Mark previous stage as done
+                    if (currentStageIndex > 0 && currentStageIndex <= newStages.length) {
+                        newStages[currentStageIndex - 1].status = "done";
+                        newStages[currentStageIndex - 1].time = "Just now";
+                        newStages[currentStageIndex - 1].icon = "check";
+                        if (newStages[currentStageIndex - 1].id === 3) newStages[currentStageIndex - 1].icon = "verified_user";
                     }
-                }
 
-                currentStageIndex++;
-                return newStages;
-            });
-        }, 3000);
+                    // If we've reached the end, loop back
+                    if (currentStageIndex >= newStages.length) {
+                        clearInterval(interval);
+                        setTimeout(runAnimation, 3000);
+                        return newStages;
+                    }
 
-        return () => clearInterval(interval);
+                    // Mark current stage as active
+                    if (newStages[currentStageIndex]) {
+                        newStages[currentStageIndex].status = "active";
+                        if (currentStageIndex === 3) { // On-Chain Gate
+                            newStages[currentStageIndex].time = "Pending Signature";
+                            newStages[currentStageIndex].icon = "pen_size_2";
+                        } else {
+                            newStages[currentStageIndex].time = "Running...";
+                            newStages[currentStageIndex].icon = "progress_activity";
+                        }
+                    }
+
+                    currentStageIndex++;
+                    return newStages;
+                });
+            }, 3000);
+        };
+
+        runAnimation();
+
+        return () => {
+            if (interval) clearInterval(interval);
+        };
     }, []);
 
     return (
-        <div className="flex flex-col min-h-full p-4 sm:p-6 space-y-2 max-w-7xl mx-auto w-full">
+        <div className="flex flex-col min-h-full p-4 sm:p-6 space-y-6 max-w-7xl mx-auto w-full">
             {/* PageHeading */}
             <div className="flex flex-wrap justify-between items-center gap-6 bg-primary/5 p-4 rounded-xl border border-primary/10">
                 <div className="flex flex-col gap-1.5">
@@ -85,70 +100,68 @@ const Dashboard = () => {
                 </Button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Pipeline Status Visual Tracker */}
-                <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                        <h3 className="text-slate-900 dark:text-white text-[11px] font-bold uppercase tracking-widest flex items-center gap-2">
-                            <span className="material-symbols-outlined text-primary text-[18px]">route</span>
-                            Pipeline Status
-                        </h3>
-                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest opacity-60">Live Monitoring</span>
-                    </div>
-                    <div className="bg-white dark:bg-[#161d2b] p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
-                        <div className="flex items-center justify-between relative px-2 py-4 min-h-[100px]">
-                            {/* Background Lines */}
-                            <div className="absolute top-1/2 left-0 w-full h-[1px] bg-slate-200 dark:bg-slate-700 -translate-y-1/2 z-0"></div>
-                            <div className="absolute top-1/2 left-0 w-3/4 h-[1px] bg-primary -translate-y-1/2 z-0"></div>
+                <DashboardCard
+                    className="lg:col-span-2"
+                    title="Pipeline Status"
+                    icon="route"
+                    extra="Live Monitoring"
+                    bodyClassName="p-8 min-h-[160px] flex items-center"
+                >
+                    <div className="flex items-center justify-between relative w-full px-4">
+                        <div className="absolute top-1/2 left-0 w-full h-[1px] bg-slate-200 dark:bg-slate-700 -translate-y-1/2 z-0"></div>
+                        <div
+                            className="absolute top-1/2 left-0 h-[1px] bg-primary -translate-y-1/2 z-0 transition-all duration-1000"
+                            style={{ width: `${(stages.filter(s => s.status === 'done').length / (stages.length - 1)) * 100}%` }}
+                        ></div>
 
-                            {/* Stages */}
-                            {stages.map((stage, index) => (
-                                <div key={index} className={`relative z-10 flex flex-col items-center gap-2.5 ${stage.status === 'pending' ? 'opacity-40' : ''}`}>
-                                    <div
-                                        className={`
-                                            flex items-center justify-center shadow-lg transition-transform duration-500
-                                            ${stage.status === 'done' ? 'size-9 rounded-full bg-accent-emerald text-white' : ''}
-                                            ${stage.status === 'active' ? 'size-11 rounded-full bg-primary text-white outline outline-4 outline-background-dark shadow-primary/20' : ''}
-                                            ${stage.status === 'pending' ? 'size-9 rounded-full bg-slate-700 text-slate-400' : ''}
-                                        `}
-                                    >
-                                        <span className={`material-symbols-outlined text-[18px] ${stage.status === 'active' && stage.icon === 'progress_activity' ? 'animate-spin' : stage.status === 'active' && stage.icon === 'pen_size_2' ? 'animate-pulse' : ''}`}>
-                                            {stage.icon}
-                                        </span>
-                                    </div>
-                                    <div className="text-center">
-                                        <p className={`text-[10px] font-bold uppercase tracking-tight ${stage.status === 'active' ? 'text-primary' : stage.status === 'pending' ? 'text-slate-500' : 'text-slate-900 dark:text-white'}`}>
-                                            {stage.label}
-                                        </p>
-                                        <p className={`text-[9px] font-mono tracking-tighter ${stage.status === 'pending' ? 'text-slate-600' : 'text-slate-500'}`}>
-                                            {stage.time}
-                                        </p>
-                                    </div>
+                        {stages.map((stage, index) => (
+                            <div key={index} className={`relative z-10 flex flex-col items-center gap-3 transition-all duration-500 ${stage.status === 'pending' ? 'opacity-40' : ''}`}>
+                                <div
+                                    className={`
+                                        flex items-center justify-center shadow-lg transition-all duration-500
+                                        ${stage.status === 'done' ? 'size-10 rounded-full bg-accent-emerald text-white' : ''}
+                                        ${stage.status === 'active' ? 'size-12 rounded-full bg-primary text-white outline outline-4 outline-background-dark shadow-primary/20 scale-110' : ''}
+                                        ${stage.status === 'pending' ? 'size-10 rounded-full bg-slate-700 text-slate-400' : ''}
+                                    `}
+                                >
+                                    <span className={`material-symbols-outlined text-[20px] ${stage.status === 'active' && stage.icon === 'progress_activity' ? 'animate-spin' : stage.status === 'active' && stage.icon === 'pen_size_2' ? 'animate-pulse' : ''}`}>
+                                        {stage.icon}
+                                    </span>
                                 </div>
-                            ))}
-                        </div>
+                                <div className="text-center">
+                                    <p className={`text-[10px] font-bold uppercase tracking-tight ${stage.status === 'active' ? 'text-primary' : stage.status === 'pending' ? 'text-slate-500' : 'text-slate-900 dark:text-white'}`}>
+                                        {stage.label}
+                                    </p>
+                                    <p className={`text-[9px] font-mono tracking-tighter ${stage.status === 'pending' ? 'text-slate-600' : 'text-slate-500'}`}>
+                                        {stage.time}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
                     </div>
-                </div>
+                </DashboardCard>
 
                 {/* Approval Center Widget */}
-                <div className="space-y-2">
-                    <h3 className="text-slate-900 dark:text-white text-[11px] font-bold uppercase tracking-widest flex items-center gap-2">
-                        <span className="material-symbols-outlined text-primary text-[18px]">gavel</span>
-                        Approval Center
-                    </h3>
-                    <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex flex-col gap-3">
-                        <div className="flex items-start gap-3">
-                            <div className="p-1.5 rounded-lg bg-primary/20 text-primary text-[16px]">
-                                <span className="material-symbols-outlined">signature</span>
+                <DashboardCard
+                    title="Approval Center"
+                    icon="gavel"
+                    bodyClassName="bg-primary/5 border-primary/20 p-5"
+                >
+                    <div className="flex flex-col gap-4">
+                        <div className="flex items-start gap-4">
+                            <div className="p-2 rounded-lg bg-primary/20 text-primary">
+                                <span className="material-symbols-outlined text-[20px]">signature</span>
                             </div>
                             <div>
                                 <h4 className="text-slate-900 dark:text-white font-bold text-[11px] uppercase tracking-wide">Signature Required</h4>
                                 <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-normal mt-1">
-                                    Pipeline #882 requires your signature to proceed with deployment.
+                                    Pipeline #882 requires your signature to proceed with deployment to Mainnet.
                                 </p>
                             </div>
                         </div>
-                        <div className="space-y-1 border-y border-primary/10 py-2">
+                        <div className="space-y-2 border-y border-primary/10 py-3">
                             <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
                                 <span className="text-slate-500">Gas Estimate</span>
                                 <span className="text-slate-900 dark:text-slate-200">~0.0042 ETH</span>
@@ -158,26 +171,22 @@ const Dashboard = () => {
                                 <span className="text-accent-emerald">Fastest</span>
                             </div>
                         </div>
-                        <Button className="w-3/4 mx-auto text-sm h-8" icon={<span className="material-symbols-outlined text-[16px]">draw</span>}>
+                        <Button className="w-full text-xs h-9" icon={<span className="material-symbols-outlined text-[18px]">draw</span>}>
                             Sign & Approve
                         </Button>
                     </div>
-                </div>
+                </DashboardCard>
             </div>
 
             {/* Recent Deployments Table */}
-            <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                    <h3 className="text-slate-900 dark:text-white text-[11px] font-bold uppercase tracking-widest flex items-center gap-2">
-                        <span className="material-symbols-outlined text-primary text-[18px]">history</span>
-                        Immutable History
-                    </h3>
-                    <button className="px-2 py-1 text-[9px] font-black uppercase tracking-widest rounded border border-slate-700 text-slate-500 hover:text-white hover:border-slate-500 transition-colors">
-                        Export CSV
-                    </button>
-                </div>
-                <div className="bg-white dark:bg-[#161d2b] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xl">
-                    <table className="w-full text-left border-collapse">
+            <DashboardCard
+                title="Immutable History"
+                icon="history"
+                extra={<button className="px-2 py-1 text-[9px] font-black uppercase tracking-widest rounded border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-primary hover:border-primary transition-colors cursor-pointer">Export CSV</button>}
+                bodyClassName="p-0"
+            >
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse min-w-[600px]">
                         <thead>
                             <tr className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800 text-[10px] text-slate-400 font-black uppercase tracking-widest">
                                 <th className="px-6 py-4">ID</th>
@@ -200,8 +209,8 @@ const Dashboard = () => {
                                     </td>
                                     <td className="px-6 py-4 font-mono text-slate-500">{row.approver}</td>
                                     <td className="px-6 py-4">
-                                        <div className="flex items-center gap-2 font-mono text-primary cursor-pointer transition-all">
-                                            <span className='hover:underline'>{row.cid}</span>
+                                        <div className="flex items-center gap-2 font-mono text-primary cursor-pointer transition-all group">
+                                            <span className='group-hover:underline'>{row.cid}</span>
                                             <span className="material-symbols-outlined text-[14px]">cloud_download</span>
                                         </div>
                                     </td>
@@ -211,10 +220,10 @@ const Dashboard = () => {
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </DashboardCard>
 
             {/* Footer Status Bar */}
-            <div className="mt-auto border-t border-slate-200 dark:border-slate-800 pt-6 flex justify-between items-center text-[9px] font-black tracking-widest text-slate-500 uppercase">
+            <footer className="mt-auto border-t border-slate-200 dark:border-slate-800 pt-6 flex flex-wrap justify-between items-center gap-4 text-[9px] font-black tracking-widest text-slate-500 uppercase">
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500/5 rounded border border-emerald-500/10">
                         <span className="size-1.5 rounded-full bg-emerald-500"></span>
@@ -228,7 +237,7 @@ const Dashboard = () => {
                 <div className="text-[10px]">
                     BLOCK: 18,452,901
                 </div>
-            </div>
+            </footer>
         </div>
     );
 };

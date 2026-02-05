@@ -14,7 +14,9 @@
   "packageManager": "pnpm@10.13.1",
   "dependencies": {
     "@heroui/react": "^2.8.8",
-    "framer-motion": "^12.30.0",
+    "@nextui-org/react": "^2.6.11",
+    "framer-motion": "^12.31.0",
+    "lucide-react": "^0.563.0",
     "material-symbols": "^0.40.2"
   }
 }
