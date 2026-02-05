@@ -1,71 +1,23 @@
 import * as React from "react";
 import { Button } from "../../Components/common/Button";
 import Pagination from "../../Components/common/Pagination";
-import StatsGrid, { type StatItem } from "../../Components/common/StatsGrid";
-import AuditTable, { type AuditEntry } from "../../Components/common/TableComp";
+import StatsGrid from "../../Components/common/StatsGrid";
+import AuditTable from "../../Components/common/TableComp";
+import { AuditStats, AuditLogsData } from "../../mock/PagesMockData/AuditData";
 
 import { Rocket, Shield, Database } from "lucide-react";
 
-const AuditDashboard: React.FC = () => {
-    const stats: StatItem[] = [
-        {
-            label: "Project Deployments",
-            value: "1,248",
-            chipText: "+12%",
-            chipType: "success",
-            icon: <Rocket size={60} strokeWidth={1.5} />
-        },
-        {
-            label: "On-Chain Proofs",
-            value: "1,246",
-            chipText: "100% Valid",
-            chipType: "slate",
-            icon: <Shield size={60} strokeWidth={1.5} />
-        },
-        {
-            label: "IPFS Data Anchored",
-            value: "70.2 GB",
-            chipText: "Encrypted",
-            chipType: "purple",
-            icon: <Database size={60} strokeWidth={1.5} />
-        },
-    ];
+const iconMap = {
+    deployments: <Rocket size={60} strokeWidth={1.5} />,
+    proofs: <Shield size={60} strokeWidth={1.5} />,
+    data: <Database size={60} strokeWidth={1.5} />
+};
 
-    const auditData: AuditEntry[] = [
-        {
-            id: "1",
-            timestamp: "Oct 24, 2023 · 14:20",
-            block: "#18234901",
-            event: "DEPLOYMENT TRIGGERED",
-            wallet: "0x71C...a29",
-            ipfs: "QmXoyp...",
-            proof: "Etherscan",
-            proofHash: "0x4a92...11e9",
-            status: "VERIFIED"
-        },
-        {
-            id: "2",
-            timestamp: "Oct 24, 2023 · 12:45",
-            block: "#18234885",
-            event: "APPROVAL SIGNED",
-            wallet: "0x483...f1b",
-            ipfs: "QmZ4tk...",
-            proof: "Etherscan",
-            proofHash: "0x9d21...fa02",
-            status: "VERIFIED"
-        },
-        {
-            id: "3",
-            timestamp: "Oct 23, 2023 · 21:05",
-            block: "#18234720",
-            event: "REGISTRY LINKED",
-            wallet: "0x123...bc4",
-            ipfs: "QmWvba...",
-            proof: "Polkascan",
-            proofHash: "0xcc41...82b3",
-            status: "VERIFIED"
-        },
-    ];
+const AuditDashboard: React.FC = () => {
+    const statsWithIcons = AuditStats.map(stat => ({
+        ...stat,
+        icon: iconMap[stat.category]
+    }));
 
     return (
         <div className="p-2 sm:p-3 lg:p-4 space-y-8 bg-nexus-bg text-white min-h-screen">
@@ -79,7 +31,7 @@ const AuditDashboard: React.FC = () => {
                     </p>
                 </div>
 
-                <StatsGrid stats={stats} />
+                <StatsGrid stats={statsWithIcons} />
 
                 <div className="flex justify-end">
                     <Button variant="primary">
@@ -87,7 +39,7 @@ const AuditDashboard: React.FC = () => {
                     </Button>
                 </div>
 
-                <AuditTable title="On-Chain Deployment Proofs" data={auditData} />
+                <AuditTable title="On-Chain Deployment Proofs" data={AuditLogsData} />
 
                 <Pagination
                     totalItems={1248}

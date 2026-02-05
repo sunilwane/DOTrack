@@ -6,18 +6,14 @@ import { Input } from "../../Components/common/Input";
 import { SocialAuth } from "../../Components/common/SocialAuth";
 import { Divider } from "../../Components/common/Divider";
 
+import { SignInFields } from "../../mock/PagesMockData/AuthData";
+
 const SignIn: React.FC = () => {
     const navigate = useNavigate();
 
     // TODO: Replace with real authentication flow
-    // 1. Add state for email/password (useState)
-    // 2. Perform client-side validation
-    // 3. Call authentication API (authService.signIn)
-    // 4. Handle success: store token securely, navigate to /dashboard
-    // 5. Handle failure: display error message to user
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Placeholder: immediate navigation (REMOVE IN PRODUCTION)
         navigate("/dashboard");
     };
 
@@ -31,27 +27,12 @@ const SignIn: React.FC = () => {
             <Divider>or</Divider>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
-                <Input
-                    label="Email address"
-                    type="email"
-                    id="email"
-                    placeholder="name@company.com"
-                    required
-                />
-
-                <div className="space-y-1.5">
-                    <div className="flex justify-between items-center mb-1.5">
-                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500" htmlFor="password">
-                            Password
-                        </label>
-                    </div>
+                {SignInFields.map((field, index) => (
                     <Input
-                        type="password"
-                        id="password"
-                        placeholder="••••••••"
-                        required
+                        key={index}
+                        {...field}
                     />
-                </div>
+                ))}
 
                 <Button type="submit" className="w-full mt-2" size="lg">
                     Sign In

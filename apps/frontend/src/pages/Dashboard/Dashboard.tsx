@@ -2,15 +2,11 @@ import { useState, useEffect } from 'react'
 import { StatusBadge } from '../../Components/common/StatusBadge';
 import { Button } from '../../Components/common/Button';
 import { DashboardCard } from '../../Components/common/DashboardCard';
+import { PipelineStages, RecentDeployments, DashboardStats } from '../../mock/PagesMockData/DashboardData';
+import type { PipelineStage } from "types";
 
 const Dashboard = () => {
-    const [stages, setStages] = useState([
-        { id: 1, label: "Build", time: "Pending", status: "pending", icon: "check" },
-        { id: 2, label: "Test Suite", time: "Pending", status: "pending", icon: "check" },
-        { id: 3, label: "Security Scan", time: "Pending", status: "pending", icon: "verified_user" },
-        { id: 4, label: "On-Chain Gate", time: "Pending", status: "pending", icon: "pen_size_2" },
-        { id: 5, label: "Deploy", time: "Queued", status: "pending", icon: "rocket_launch" },
-    ]);
+    const [stages, setStages] = useState<PipelineStage[]>(PipelineStages);
 
     useEffect(() => {
         let currentStageIndex = 0;
@@ -90,17 +86,17 @@ const Dashboard = () => {
                     <div className="flex items-center gap-3">
                         <StatusBadge status="success" className="px-1.5 py-0.5 text-[9px]">Active</StatusBadge>
                         <h1 className="text-slate-900 dark:text-white text-sm font-bold uppercase tracking-wider">
-                            OpenSource-DApp-v1
+                            {DashboardStats.projectName}
                         </h1>
                     </div>
                     <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-slate-500 dark:text-slate-400 text-[11px] font-medium">
                         <div className="flex items-center gap-2">
                             <span className="material-symbols-outlined text-[14px]">code</span>
-                            <span>github.com/org/core-protocol</span>
+                            <span>{DashboardStats.githubRepo}</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <span className="material-symbols-outlined text-[14px]">terminal</span>
-                            <span className="font-mono text-[10px]">0x71C765...d897</span>
+                            <span className="font-mono text-[10px]">{DashboardStats.walletAddress}</span>
                             <span className="material-symbols-outlined text-[14px] cursor-pointer hover:text-primary transition-colors">
                                 content_copy
                             </span>
@@ -177,11 +173,11 @@ const Dashboard = () => {
                         <div className="space-y-1 border-y border-primary/10 py-1.5">
                             <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
                                 <span className="text-slate-500">Gas Estimate</span>
-                                <span className="text-slate-900 dark:text-slate-200">~0.0042 ETH</span>
+                                <span className="text-slate-900 dark:text-slate-200">{DashboardStats.gasEstimate}</span>
                             </div>
                             <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
                                 <span className="text-slate-500">Priority</span>
-                                <span className="text-accent-emerald">Fastest</span>
+                                <span className="text-accent-emerald">{DashboardStats.priority}</span>
                             </div>
                         </div>
                         <Button className="w-full text-xs h-7" icon={<span className="material-symbols-outlined text-[16px]">draw</span>}>
@@ -210,11 +206,7 @@ const Dashboard = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                            {[
-                                { id: "#881", status: "SUCCESS", approver: "0x4b9...9a12", cid: "QmXoyp...3Vp8", time: "2023-11-24 14:32:01", success: true },
-                                { id: "#880", status: "SUCCESS", approver: "0x71C...d897", cid: "QmNrg8...9Lk2", time: "2023-11-23 09:15:44", success: true },
-                                { id: "#879", status: "FAILED", approver: "0x71C...d897", cid: "QmZ6t2...6Hj1", time: "2023-11-22 18:02:12", success: false },
-                            ].map((row, index) => (
+                            {RecentDeployments.map((row, index) => (
                                 <tr key={index} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-[11px]">
                                     <td className="px-6 py-4 font-mono text-slate-900 dark:text-slate-300">{row.id}</td>
                                     <td className="px-6 py-4">
@@ -248,7 +240,7 @@ const Dashboard = () => {
                     </div>
                 </div>
                 <div className="text-[10px]">
-                    BLOCK: 18,452,901
+                    BLOCK: {DashboardStats.blockNumber}
                 </div>
             </footer>
         </div>
