@@ -31,7 +31,7 @@ function Topbar() {
                     icon={<span className="material-symbols-outlined" aria-hidden="true">add_circle</span>}
                     aria-label="New Pipeline"
                 >
-                    <span className="hidden sm:inline">New Pipeline</span>
+                    <span className="hidden sm:inline text-sm">New Pipeline</span>
                 </Button>
 
                 {/* User Profile */}

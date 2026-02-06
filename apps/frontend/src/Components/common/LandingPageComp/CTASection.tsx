@@ -23,9 +23,9 @@ export const CTASection: React.FC = () => {
                         </p>
                         <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 relative z-10 w-full sm:w-auto px-4 mt-2">
                             <Button
-                                variant="outline"
+                                variant="primary"
                                 size="xl"
-                                className="bg-white text-primary border-white hover:bg-slate-100"
+                                className="bg-primary border-white text-white hover:bg-white/80 hover:text-primary"
                                 onClick={() => navigate("/connect")}
                             >
                                 Connect Wallet

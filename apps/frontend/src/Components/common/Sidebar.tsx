@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Logo } from '../common/Logo';
 import { Button } from '../common/Button';
 import { Scroller } from '../common/Scroller';
+import { SimpleTooltip } from '../common/SimpleTooltip';
 import ProjectFilter from '../../pages/AuditLogs/ProjectFilter';
 
 interface NavItem {
@@ -22,6 +23,7 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
     const navigate = useNavigate();
     const location = useLocation();
     const [isAuditExpanded, setIsAuditExpanded] = React.useState(false);
+    const hamburgerRef = React.useRef<HTMLButtonElement>(null);
 
     React.useEffect(() => {
         if (location.pathname === '/audit-logs') {
@@ -31,8 +33,20 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
         }
     }, [location.pathname]);
 
+    const handleToggleSidebar = () => {
+        setIsCollapsed(!isCollapsed);
+        // Auto-blur after 1 second to remove highlight
+        setTimeout(() => {
+            if (hamburgerRef.current) {
+                hamburgerRef.current.blur();
+            }
+        }, 1000);
+    };
+
     const navItems: NavItem[] = [
         { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', path: '/dashboard', iconFilled: true },
+        { id: 'projects', label: 'Projects', icon: 'grid_view', path: '/all-projects', iconFilled: true },
+        { id: 'register', label: 'Register Project', icon: 'add_circle', path: '/register-project' },
         { id: 'pipelines', label: 'Pipelines', icon: 'account_tree', path: '/pipelines' },
         { id: 'ipfs', label: 'IPFS Templates', icon: 'description', path: '/ipfs-templates' },
         { id: 'audit', label: 'Audit Logs', icon: 'security', path: '/audit-logs' },
@@ -44,34 +58,44 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
     const renderNavItem = (item: NavItem) => {
         const isCurrentlyActive = isActive(item.path);
 
+        const buttonElement = (
+            <button
+                type="button"
+                onClick={() => {
+                    if (item.id === 'audit' && location.pathname === '/audit-logs') {
+                        setIsAuditExpanded(!isAuditExpanded);
+                    }
+                    navigate(item.path);
+                }}
+                className={`
+                    flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all cursor-pointer group w-full relative
+                    ${isCurrentlyActive
+                        ? 'bg-primary/10 text-primary border border-primary/20 shadow-lg shadow-primary/5'
+                        : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
+                    }
+                    ${isCollapsed ? 'justify-center px-2' : ''}
+                `}
+                aria-current={isCurrentlyActive ? 'page' : undefined}
+            >
+                <span
+                    className="material-symbols-outlined text-xl transition-transform group-hover:scale-110"
+                    style={item.iconFilled && isCurrentlyActive ? { fontVariationSettings: "'FILL' 1" } : {}}
+                >
+                    {item.icon}
+                </span>
+                {!isCollapsed && <p className="text-sm font-bold whitespace-nowrap">{item.label}</p>}
+            </button>
+        );
+
         return (
             <div key={item.id} className="flex flex-col gap-1">
-                <button
-                    type="button"
-                    onClick={() => {
-                        if (item.id === 'audit' && location.pathname === '/audit-logs') {
-                            setIsAuditExpanded(!isAuditExpanded);
-                        }
-                        navigate(item.path);
-                    }}
-                    className={`
-                        flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all cursor-pointer group w-full
-                        ${isCurrentlyActive
-                            ? 'bg-primary/10 text-primary border border-primary/20 shadow-lg shadow-primary/5'
-                            : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
-                        }
-                        ${isCollapsed ? 'justify-center px-0' : ''}
-                    `}
-                    aria-current={isCurrentlyActive ? 'page' : undefined}
-                >
-                    <span
-                        className="material-symbols-outlined transition-transform group-hover:scale-110"
-                        style={item.iconFilled && isCurrentlyActive ? { fontVariationSettings: "'FILL' 1" } : {}}
-                    >
-                        {item.icon}
-                    </span>
-                    {!isCollapsed && <p className="text-sm font-bold whitespace-nowrap">{item.label}</p>}
-                </button>
+                {isCollapsed ? (
+                    <SimpleTooltip label={item.label} placement="right" className="w-full">
+                        {buttonElement}
+                    </SimpleTooltip>
+                ) : (
+                    buttonElement
+                )}
 
                 {item.id === 'audit' && (
                     <div className={`grid transition-all duration-300 ease-in-out ${isAuditExpanded && !isCollapsed ? 'grid-rows-[1fr] opacity-100 mt-2' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
@@ -85,14 +109,14 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
     };
 
     return (
-        <aside className={`${isCollapsed ? 'w-20' : 'w-64'} h-screen fixed top-0 left-0 flex flex-col justify-between bg-[#111318] border-r border-slate-800 p-4 transition-all duration-300 z-50`}>
+        <aside className={`${isCollapsed ? 'w-20' : 'w-64'} h-screen fixed top-0 left-0 flex flex-col justify-between bg-[#111318] border-r border-slate-800 p-4 transition-all duration-300 z-50 overflow-hidden`}>
             {/* Top Section */}
             <div className="flex flex-col gap-10 flex-1 min-h-0">
                 {/* Logo & Toggle */}
-                <div className={`flex items-center ${isCollapsed ? 'flex-col justify-center gap-4' : 'justify-between'} px-2 overflow-hidden transition-all duration-300`}>
+                <div className={`flex items-center ${isCollapsed ? 'flex-col justify-center gap-4' : 'gap-3'} transition-all duration-300`}>
                     <button
                         type="button"
-                        className={`flex items-center gap-3 ${isCollapsed ? 'hidden' : 'flex'} cursor-pointer bg-transparent border-none p-0 text-left`}
+                        className={`flex items-center gap-3 ${isCollapsed ? 'hidden' : 'flex'} cursor-pointer bg-transparent border-none p-0 text-left flex-1 focus:outline-none`}
                         onClick={() => navigate("/")}
                         aria-label="Navigate to home"
                     >
@@ -108,7 +132,7 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                     {isCollapsed && (
                         <button
                             type="button"
-                            className="cursor-pointer bg-transparent border-none p-0"
+                            className="cursor-pointer bg-transparent border-none p-0 focus:outline-none"
                             onClick={() => navigate("/")}
                             aria-label="Navigate to home"
                         >
@@ -117,21 +141,31 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                     )}
 
                     <button
-                        onClick={() => setIsCollapsed(!isCollapsed)}
-                        className="text-slate-400 hover:text-white transition-colors cursor-pointer bg-transparent border-none p-0 flex items-center justify-center"
+                        ref={hamburgerRef}
+                        onClick={handleToggleSidebar}
+                        className="text-slate-400 hover:text-white transition-colors cursor-pointer bg-transparent border-none p-2 flex items-center justify-center rounded-lg hover:bg-white/5 focus:outline-none shrink-0"
+                        aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                     >
-                        <span className="material-symbols-outlined text-xl">{isCollapsed ? 'chevron_right' : 'menu_open'}</span>
+                        <span className="material-symbols-outlined text-xl">menu</span>
                     </button>
                 </div>
 
                 {/* Navigation Menu */}
-                <Scroller className="flex-1" direction="vertical" scrollbarStyle="thin">
-                    <nav>
+                {isCollapsed ? (
+                    <nav className="flex-1 overflow-y-auto overflow-x-visible px-1 scrollbar-hide">
                         <div className="flex flex-col gap-1">
                             {navItems.map(renderNavItem)}
                         </div>
                     </nav>
-                </Scroller>
+                ) : (
+                    <Scroller className="flex-1" direction="vertical" scrollbarStyle="thin">
+                        <nav>
+                            <div className="flex flex-col gap-1">
+                                {navItems.map(renderNavItem)}
+                            </div>
+                        </nav>
+                    </Scroller>
+                )}
             </div>
 
             {/* Bottom Section */}
@@ -148,19 +182,22 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                 {/* Action Button */}
                 {!isCollapsed ? (
                     <Button
-                        className="w-full h-11"
+                        
+                        className="w-full h-11 "
                         onClick={() => navigate("/connect")}
-                        icon={<span className="material-symbols-outlined text-lg">account_balance_wallet</span>}
+                        icon={<span className="material-symbols-outlined size-6.5">account_balance_wallet</span>}
                     >
-                        Wallet Active
+                       <span className="text-sm"> Wallet Active</span> 
                     </Button>
                 ) : (
-                    <button
-                        className="flex size-11 mx-auto cursor-pointer items-center justify-center rounded-lg bg-primary text-white hover:bg-primary/90 transition-all border-none shadow-lg shadow-primary/20"
-                        onClick={() => navigate("/connect")}
-                    >
-                        <span className="material-symbols-outlined">wallet</span>
-                    </button>
+                    <SimpleTooltip label="Wallet Active" placement="right" className="w-full">
+                        <button
+                            className="flex size-11 mx-auto cursor-pointer items-center justify-center rounded-lg bg-primary text-white hover:bg-primary/90 transition-all border-none shadow-lg shadow-primary/20"
+                            onClick={() => navigate("/connect")}
+                        >
+                            <span className="material-symbols-outlined">wallet</span>
+                        </button>
+                    </SimpleTooltip>
                 )}
 
                 {/* Footer Links */}
@@ -173,17 +210,28 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
     );
 }
 
-const SidebarLink: React.FC<{ icon: string; label: string; collapsed: boolean; onClick?: () => void }> = ({ icon, label, collapsed, onClick }) => (
-    <button
-        type="button"
-        onClick={onClick}
-        className={`flex items-center gap-3 px-3 py-2 text-slate-400 hover:text-white cursor-pointer transition-colors group w-full ${collapsed ? 'justify-center px-0' : ''}`}
-        title={label}
-        aria-label={label}
-    >
-        <span className="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">{icon}</span>
-        {!collapsed && <p className="text-xs font-bold uppercase tracking-widest">{label}</p>}
-    </button>
-);
+const SidebarLink: React.FC<{ icon: string; label: string; collapsed: boolean; onClick?: () => void }> = ({ icon, label, collapsed, onClick }) => {
+    const buttonElement = (
+        <button
+            type="button"
+            onClick={onClick}
+            className={`flex items-center gap-3 px-3 py-2 text-slate-400 hover:text-white cursor-pointer transition-colors group w-full ${collapsed ? 'justify-center px-0' : ''}`}
+            aria-label={label}
+        >
+            <span className="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">{icon}</span>
+            {!collapsed && <p className="text-xs font-bold uppercase tracking-widest">{label}</p>}
+        </button>
+    );
+
+    if (collapsed) {
+        return (
+            <SimpleTooltip label={label} placement="right" className="w-full">
+                {buttonElement}
+            </SimpleTooltip>
+        );
+    }
+
+    return buttonElement;
+};
 
 export default Sidebar;
