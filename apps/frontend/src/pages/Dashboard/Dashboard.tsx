@@ -79,9 +79,9 @@ const Dashboard = () => {
     }, []);
 
     return (
-        <div className="flex flex-col min-h-full p-0 space-y-6 max-w-7xl mx-auto w-full">
+        <div className="flex flex-col min-h-full p-0 space-y-0 max-w-7xl mx-auto w-full">
             {/* PageHeading */}
-            <div className="flex flex-wrap justify-between items-center gap-6 bg-primary/5 p-6 rounded-xl border border-primary/10">
+            <div className="flex flex-wrap  items-center gap-6 bg-primary/5 p-6 rounded-xl border border-primary/10">
                 <div className="flex flex-col gap-1.5">
                     <div className="flex items-center gap-3">
                         <StatusBadge status="success" className="px-1.5 py-0.5 text-[9px]">Active</StatusBadge>
@@ -103,15 +103,27 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </div>
-                <Button variant="secondary" size="sm" className="h-8 text-[11px]" icon={<span className="material-symbols-outlined text-[16px]">open_in_new</span>}>
+                <div className="ml-auto flex items-center gap-5">
+                    <button className="text-[9px] font-black uppercase tracking-widest rounded border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-primary hover:border-primary transition-colors cursor-pointer">
+                    <span className='text-sm'>Export CSV</span> 
+                    </button>
+
+                    <Button
+                    variant="secondary"
+                    size="sm"
+                    className="h-8 text-[11px]"
+                    icon={<span className="material-symbols-outlined text-[16px]">open_in_new</span>}
+                    >
                     Etherscan
-                </Button>
+                    </Button>
+                </div>
+                
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-6 gap-6  mt-8">
                 {/* Pipeline Status Visual Tracker */}
                 <DashboardCard
-                    className="lg:col-span-3"
+                    className="lg:col-span-3 "
                     title="Pipeline Status"
                     icon="route"
                     extra="Live Monitoring"
@@ -153,7 +165,7 @@ const Dashboard = () => {
 
                 {/* Approval Center Widget */}
                 <DashboardCard
-                    className="lg:col-span-2"
+                    className="lg:col-span-3"
                     title="Approval Center"
                     icon="gavel"
                     bodyClassName="bg-primary/5 border-primary/20 p-3"
@@ -164,7 +176,7 @@ const Dashboard = () => {
                                 <span className="material-symbols-outlined text-[18px]">signature</span>
                             </div>
                             <div>
-                                <h4 className="text-slate-900 dark:text-white font-bold text-[11px] uppercase tracking-wide">Signature Required</h4>
+                                <h4 className="text-slate-900 dark:text-white font-bold text-[11px] uppercase tracking-widest">Signature Required</h4>
                                 <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal mt-0.5">
                                     Pipeline #882 requires your signature to proceed with deployment to Mainnet.
                                 </p>
@@ -180,8 +192,8 @@ const Dashboard = () => {
                                 <span className="text-accent-emerald">{DashboardStats.priority}</span>
                             </div>
                         </div>
-                        <Button className="w-full text-xs h-7" icon={<span className="material-symbols-outlined text-[16px]">draw</span>}>
-                            Sign & Approve
+                        <Button className="w-full text-xs h-7" icon={<span className="material-symbols-outlined text-[16px] size-6.5">draw</span>}>
+                            <span className='text-sm'>Sign & Approve</span>
                         </Button>
                     </div>
                 </DashboardCard>
@@ -191,7 +203,7 @@ const Dashboard = () => {
             <DashboardCard
                 title="Immutable History"
                 icon="history"
-                extra={<button className="px-2 py-1 text-[9px] font-black uppercase tracking-widest rounded border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-primary hover:border-primary transition-colors cursor-pointer">Export CSV</button>}
+                
                 bodyClassName="p-0"
             >
                 <div className="overflow-x-auto">
@@ -232,7 +244,7 @@ const Dashboard = () => {
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500/5 rounded border border-emerald-500/10">
                         <span className="size-1.5 rounded-full bg-emerald-500"></span>
-                        IPFS: ONLINE
+                        spanIPFS: ONLINE
                     </div>
                     <div className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500/5 rounded border border-emerald-500/10">
                         <span className="size-1.5 rounded-full bg-emerald-500"></span>

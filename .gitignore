@@ -7,6 +7,9 @@ dist
 # Logs
 *.log
 
+# Build info
+*.tsbuildinfo
+
 
 # OS files
 .DS_Store
