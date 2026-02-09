@@ -11,6 +11,7 @@ import AuditDashboard from "../pages/AuditLogs/AuditLogs";
 import Pipeline from "../pages/Pipeline/Pipeline";
 import AllProjects from "../pages/Projects/Projects";
 import RegisterProject from "../pages/RegisterProject/RegisterProject";
+import VersionHistory from "../pages/VersionHistory/VersionHistory";
 
 import { AppLayout } from "../Components/layout/AppLayout";
 
@@ -32,6 +33,7 @@ export const AppRouter = () => {
         <Route path="/deployments" element={<Deployments />} />
         <Route path="/pipelines" element={<Pipeline />} />
         <Route path="/audit-logs" element={<AuditDashboard />} />
+        <Route path="/version-history" element={<VersionHistory />} />
 
       </Route>
 

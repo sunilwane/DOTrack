@@ -1,12 +1,16 @@
 import * as React from "react";
 import { Button } from "../../Components/common/Button";
 import { mockRegisterProjectData, mockRegistrationSteps } from "../../mock/PagesMockData/registerProjects";
+import ProgressSection from "./ProgressSection";
+import StepsIndicator from "./StepsIndicator";
+import RegistrationSummary from "./RegistrationSummary";
+import GasEstimateCard from "./GasEstimateCard";
 
 const RegisterProject: React.FC = () => {
     return (
         <main className="flex-1 flex justify-center py-12 px-4 w-full">
             <div className="w-full max-w-[1000px] flex flex-col gap-8">
-                {/* Headline Section */}
+                
                 <div className="text-center">
                     <h1 className="text-slate-900 dark:text-white tracking-tight text-2xl font-bold leading-tight pb-2">
                         Register New Project
@@ -16,7 +20,7 @@ const RegisterProject: React.FC = () => {
                     </p>
                 </div>
 
-                {/* Progress Bar & Tabs Component */}
+                
                 <div className="bg-white dark:bg-[#1a202c] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                     <div className="p-6 border-b border-slate-100 dark:border-slate-800">
                         <div className="flex flex-col gap-3">
@@ -35,7 +39,7 @@ const RegisterProject: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Tabs/Steps Indicator */}
+                   
                     <div className="flex border-b border-slate-100 dark:border-[#3b4354] px-6">
                         {mockRegistrationSteps.map((step) => (
                             <a
@@ -55,7 +59,7 @@ const RegisterProject: React.FC = () => {
                         ))}
                     </div>
 
-                    {/* Content Area: Step 3 Blockchain Registration */}
+                    
                     <div className="p-8">
                         <div className="flex flex-col gap-6">
                             <div>
@@ -68,7 +72,7 @@ const RegisterProject: React.FC = () => {
                                 </p>
                             </div>
 
-                            {/* Summary Card */}
+                            
                             <div className="bg-slate-50 dark:bg-[#282e39]/30 rounded-xl p-6 border border-slate-100 dark:border-slate-800">
                                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-4">
                                     Registration Summary
@@ -107,7 +111,7 @@ const RegisterProject: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Gas Estimate Component */}
+                            
                             <div className="flex flex-col gap-4">
                                 <div className="flex items-center justify-between p-4 rounded-xl border-2 border-primary/30 bg-primary/5 dark:bg-primary/10">
                                     <div className="flex items-center gap-3">
@@ -136,7 +140,7 @@ const RegisterProject: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Action Buttons */}
+                            
                             <div className="flex items-center gap-4 mt-4">
                                 <Button variant="outline" className="flex-1">
                                     Back
@@ -153,7 +157,7 @@ const RegisterProject: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Validation/Help State Footer */}
+                
                 <div className="flex justify-center items-center gap-8 py-4 border-t border-slate-100 dark:border-slate-800">
                     <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
                         <span className="material-symbols-outlined text-lg">verified_user</span>
@@ -169,7 +173,7 @@ const RegisterProject: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Success Toast (Hidden by default) */}
+                
                 <div className="fixed bottom-8 right-8 hidden items-center gap-4 bg-emerald-500 text-white px-6 py-4 rounded-xl shadow-xl">
                     <span className="material-symbols-outlined">check_circle</span>
                     <div className="text-sm">

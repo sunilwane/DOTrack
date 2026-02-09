@@ -1,13 +1,12 @@
 import * as React from "react";
 import { AuthLayout } from "../../Components/layout/AuthLayout";
-
+import { WalletOptionCard } from "./WalletOptionCard";
 import { WalletOptions } from "../../mock/PagesMockData/WalletData";
-import type { WalletOption as WalletOptionType } from "types";
 
 const ConnectWallet: React.FC = () => {
-    // TODO: Integrate wallet connection state (useAccount, useNetwork from wagmi/web3-react)
-    const isConnected = false; // Replace with actual wallet connection state
-    const isPolygonMainnet = false; // Replace with actual network check
+    
+    const isConnected = false; 
+    const isPolygonMainnet = false; 
 
     return (
        
@@ -17,7 +16,7 @@ const ConnectWallet: React.FC = () => {
                 backgroundVariant="mesh"
                 maxWidth="max-w-[480px]"
             >
-                {/* Status Badge */}
+               
                 {isConnected && isPolygonMainnet && (
                     <div className="flex items-center justify-center mb-8">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
@@ -30,17 +29,17 @@ const ConnectWallet: React.FC = () => {
                     </div>
                 )}
 
-                {/* Wallet Options */}
+               
                 <div className="space-y-3 mb-8">
                     {WalletOptions.map((option, index) => (
-                        <WalletOption
+                        <WalletOptionCard
                             key={index}
                             {...option}
                         />
                     ))}
                 </div>
 
-                {/* Security Check */}
+                
                 <div className="bg-primary/10 border border-primary/20 rounded-xl p-4">
                     <div className="flex items-start gap-3">
                         <span className="material-symbols-outlined text-primary text-xl">verified_user</span>
@@ -65,22 +64,5 @@ const ConnectWallet: React.FC = () => {
 
     );
 };
-
-const WalletOption: React.FC<WalletOptionType> = ({ name, description, icon, iconColor }) => (
-    <div className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-xl px-4 min-h-[72px] py-2 justify-between transition-all group">
-        <div className="flex items-center gap-4">
-            <div className="text-white flex items-center justify-center rounded-lg bg-[#282e39] shrink-0 size-12 shadow-inner">
-                <span className={`material-symbols-outlined ${iconColor}`}>{icon}</span>
-            </div>
-            <div className="flex flex-col justify-center">
-                <p className="text-white text-base font-semibold leading-normal line-clamp-1">{name}</p>
-                <p className="text-[#9ca6ba] text-xs font-normal leading-normal">{description}</p>
-            </div>
-        </div>
-        <div className="shrink-0 group-hover:translate-x-1 transition-transform">
-            <span className="material-symbols-outlined text-white/40">chevron_right</span>
-        </div>
-    </div>
-);
 
 export default ConnectWallet;

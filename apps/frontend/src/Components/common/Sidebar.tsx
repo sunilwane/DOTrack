@@ -35,7 +35,7 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
 
     const handleToggleSidebar = () => {
         setIsCollapsed(!isCollapsed);
-        // Auto-blur after 1 second to remove highlight
+        
         setTimeout(() => {
             if (hamburgerRef.current) {
                 hamburgerRef.current.blur();
@@ -50,6 +50,7 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
         { id: 'pipelines', label: 'Pipelines', icon: 'account_tree', path: '/pipelines' },
         { id: 'ipfs', label: 'IPFS Templates', icon: 'description', path: '/ipfs-templates' },
         { id: 'audit', label: 'Audit Logs', icon: 'security', path: '/audit-logs' },
+        { id: 'version-history', label: 'Version History', icon: 'history', path: '/version-history', iconFilled: true },
         { id: 'settings', label: 'Settings', icon: 'settings', path: '/settings' },
     ];
 
@@ -110,9 +111,9 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
 
     return (
         <aside className={`${isCollapsed ? 'w-20' : 'w-64'} h-screen fixed top-0 left-0 flex flex-col justify-between bg-[#111318] border-r border-slate-800 p-4 transition-all duration-300 z-50 overflow-hidden`}>
-            {/* Top Section */}
+            
             <div className="flex flex-col gap-10 flex-1 min-h-0">
-                {/* Logo & Toggle */}
+                
                 <div className={`flex items-center ${isCollapsed ? 'flex-col justify-center gap-4' : 'gap-3'} transition-all duration-300`}>
                     <button
                         type="button"
@@ -150,7 +151,7 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                     </button>
                 </div>
 
-                {/* Navigation Menu */}
+                
                 {isCollapsed ? (
                     <nav className="flex-1 overflow-y-auto overflow-x-visible px-1 scrollbar-hide">
                         <div className="flex flex-col gap-1">
@@ -168,9 +169,9 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                 )}
             </div>
 
-            {/* Bottom Section */}
+            
             <div className="flex flex-col gap-4 mt-auto pt-4 border-t border-slate-800/50">
-                {/* Connected Wallet Info */}
+                
                 <div className={`p-3 bg-white/5 rounded-lg border border-white/10 ${isCollapsed ? 'flex justify-center transition-all' : ''}`}>
                     {!isCollapsed && <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-2">Network Active</p>}
                     <div className="flex items-center gap-2">
@@ -179,7 +180,7 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                     </div>
                 </div>
 
-                {/* Action Button */}
+                
                 {!isCollapsed ? (
                     <Button
                         
@@ -200,7 +201,7 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                     </SimpleTooltip>
                 )}
 
-                {/* Footer Links */}
+               
                 <div className={`flex flex-col gap-1 border-t border-white/5 pt-2 ${isCollapsed ? 'items-center' : ''}`}>
                     <SidebarLink icon="menu_book" label="Docs" collapsed={isCollapsed} onClick={() => window.open('https://docs.example.com', '_blank')} />
                     <SidebarLink icon="support" label="Support" collapsed={isCollapsed} onClick={() => window.open('https://support.example.com', '_blank')} />

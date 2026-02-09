@@ -1,87 +1,18 @@
-import { useState, useEffect } from 'react'
 import { StatusBadge } from '../../Components/common/StatusBadge';
 import { Button } from '../../Components/common/Button';
 import { DashboardCard } from '../../Components/common/DashboardCard';
 import { PipelineStages, RecentDeployments, DashboardStats } from '../../mock/PagesMockData/DashboardData';
-import type { PipelineStage } from "types";
+import { usePipelineAnimation } from './usePipelineAnimation';
+import PipelineTracker from './PipelineTracker';
+import RecentDeploymentsTable from './RecentDeploymentsTable';
 
 const Dashboard = () => {
-    const [stages, setStages] = useState<PipelineStage[]>(PipelineStages);
-
-    useEffect(() => {
-        let currentStageIndex = 0;
-        let interval: any;
-        let restartTimeout: any;
-
-        const runAnimation = () => {
-            // Reset all stages to pending
-            setStages(prev => prev.map(s => ({
-                ...s,
-                status: "pending",
-                time: s.id === 5 ? "Queued" : "Pending",
-                icon: s.id === 3 ? "verified_user" : s.id === 4 ? "pen_size_2" : s.id === 5 ? "rocket_launch" : "check"
-            })));
-            currentStageIndex = 0;
-
-            interval = setInterval(() => {
-                setStages(prev => {
-                    const newStages = [...prev];
-
-                    // If we've completed all stages, mark last as done and restart
-                    if (currentStageIndex >= newStages.length) {
-                        // Mark the last stage as done before restarting
-                        if (currentStageIndex === newStages.length && newStages[currentStageIndex - 1]) {
-                            newStages[currentStageIndex - 1].status = "done";
-                            newStages[currentStageIndex - 1].time = "Complete";
-                            newStages[currentStageIndex - 1].icon = "check";
-                        }
-                        clearInterval(interval);
-                        restartTimeout = setTimeout(runAnimation, 3000);
-                        return newStages;
-                    }
-
-                    // Mark previous stage as done
-                    if (currentStageIndex > 0) {
-                        newStages[currentStageIndex - 1].status = "done";
-                        const timeAgo = ["2m ago", "1m ago", "45s ago", "30s ago"];
-                        newStages[currentStageIndex - 1].time = timeAgo[currentStageIndex - 1] || "Just now";
-                        newStages[currentStageIndex - 1].icon = "check";
-                        if (newStages[currentStageIndex - 1].id === 3) {
-                            newStages[currentStageIndex - 1].icon = "verified_user";
-                        }
-                    }
-
-                    // Mark current stage as active
-                    newStages[currentStageIndex].status = "active";
-                    if (currentStageIndex === 3) { // On-Chain Gate
-                        newStages[currentStageIndex].time = "Pending Signature";
-                        newStages[currentStageIndex].icon = "pen_size_2";
-                    } else if (currentStageIndex === 4) { // Deploy
-                        newStages[currentStageIndex].time = "Deploying...";
-                        newStages[currentStageIndex].icon = "rocket_launch";
-                    } else {
-                        newStages[currentStageIndex].time = "Running...";
-                        newStages[currentStageIndex].icon = "progress_activity";
-                    }
-
-                    currentStageIndex++;
-                    return newStages;
-                });
-            }, 2500);
-        };
-
-        runAnimation();
-
-        return () => {
-            if (interval) clearInterval(interval);
-            if (restartTimeout) clearTimeout(restartTimeout);
-        };
-    }, []);
+    const stages = usePipelineAnimation(PipelineStages);
 
     return (
         <div className="flex flex-col min-h-full p-0 space-y-0 max-w-7xl mx-auto w-full">
-            {/* PageHeading */}
-            <div className="flex flex-wrap  items-center gap-6 bg-primary/5 p-6 rounded-xl border border-primary/10">
+           
+            <div className="flex flex-wrap items-center gap-6 bg-primary/5 p-6 rounded-xl border border-primary/10">
                 <div className="flex flex-col gap-1.5">
                     <div className="flex items-center gap-3">
                         <StatusBadge status="success" className="px-1.5 py-0.5 text-[9px]">Active</StatusBadge>
@@ -105,65 +36,33 @@ const Dashboard = () => {
                 </div>
                 <div className="ml-auto flex items-center gap-5">
                     <button className="text-[9px] font-black uppercase tracking-widest rounded border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-primary hover:border-primary transition-colors cursor-pointer">
-                    <span className='text-sm'>Export CSV</span> 
+                        <span className='text-sm'>Export CSV</span>
                     </button>
 
                     <Button
-                    variant="secondary"
-                    size="sm"
-                    className="h-8 text-[11px]"
-                    icon={<span className="material-symbols-outlined text-[16px]">open_in_new</span>}
+                        variant="secondary"
+                        size="sm"
+                        className="h-8 text-[11px]"
+                        icon={<span className="material-symbols-outlined text-[16px]">open_in_new</span>}
                     >
-                    Etherscan
+                        Etherscan
                     </Button>
                 </div>
-                
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-6 gap-6  mt-8">
-                {/* Pipeline Status Visual Tracker */}
+            <div className="grid grid-cols-1 lg:grid-cols-6 gap-6 mt-8">
+                
                 <DashboardCard
-                    className="lg:col-span-3 "
+                    className="lg:col-span-3"
                     title="Pipeline Status"
                     icon="route"
                     extra="Live Monitoring"
                     bodyClassName="p-6 min-h-[140px] flex items-center"
                 >
-                    <div className="flex items-center justify-between relative w-full px-4">
-                        <div className="absolute top-1/2 left-0 w-full h-[1px] bg-slate-200 dark:bg-slate-700 -translate-y-1/2 z-0"></div>
-                        <div
-                            className="absolute top-1/2 left-0 h-[1px] bg-primary -translate-y-1/2 z-0 transition-all duration-1000"
-                            style={{ width: `${stages.length > 1 ? (stages.filter(s => s.status === 'done').length / (stages.length - 1)) * 100 : 0}%` }}
-                        ></div>
-
-                        {stages.map((stage, index) => (
-                            <div key={index} className={`relative z-10 flex flex-col items-center gap-3 transition-all duration-500 ${stage.status === 'pending' ? 'opacity-40' : ''}`}>
-                                <div
-                                    className={`
-                                        flex items-center justify-center shadow-lg transition-all duration-500
-                                        ${stage.status === 'done' ? 'size-10 rounded-full bg-accent-emerald text-white' : ''}
-                                        ${stage.status === 'active' ? 'size-12 rounded-full bg-primary text-white outline outline-4 outline-background-dark shadow-primary/20 scale-110' : ''}
-                                        ${stage.status === 'pending' ? 'size-10 rounded-full bg-slate-700 text-slate-400' : ''}
-                                    `}
-                                >
-                                    <span className={`material-symbols-outlined text-[20px] ${stage.status === 'active' && stage.icon === 'progress_activity' ? 'animate-spin' : stage.status === 'active' && stage.icon === 'pen_size_2' ? 'animate-pulse' : ''}`}>
-                                        {stage.icon}
-                                    </span>
-                                </div>
-                                <div className="text-center">
-                                    <p className={`text-[10px] font-bold uppercase tracking-tight ${stage.status === 'active' ? 'text-primary' : stage.status === 'pending' ? 'text-slate-500' : 'text-slate-900 dark:text-white'}`}>
-                                        {stage.label}
-                                    </p>
-                                    <p className={`text-[9px] font-mono tracking-tighter ${stage.status === 'pending' ? 'text-slate-600' : 'text-slate-500'}`}>
-                                        {stage.time}
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    <PipelineTracker stages={stages} />
                 </DashboardCard>
 
-                {/* Approval Center Widget */}
+                
                 <DashboardCard
                     className="lg:col-span-3"
                     title="Approval Center"
@@ -199,52 +98,21 @@ const Dashboard = () => {
                 </DashboardCard>
             </div>
 
-            {/* Recent Deployments Table */}
+            
             <DashboardCard
                 title="Immutable History"
                 icon="history"
-                
                 bodyClassName="p-0"
             >
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse min-w-[600px]">
-                        <thead>
-                            <tr className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800 text-[10px] text-slate-400 font-black uppercase tracking-widest">
-                                <th className="px-6 py-4">ID</th>
-                                <th className="px-6 py-4">Status</th>
-                                <th className="px-6 py-4">Approver</th>
-                                <th className="px-6 py-4">CID</th>
-                                <th className="px-6 py-4">Timestamp</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                            {RecentDeployments.map((row, index) => (
-                                <tr key={index} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-[11px]">
-                                    <td className="px-6 py-4 font-mono text-slate-900 dark:text-slate-300">{row.id}</td>
-                                    <td className="px-6 py-4">
-                                        <StatusBadge status={row.success ? 'success' : 'error'} className="text-[9px] px-2 py-0.5">{row.status}</StatusBadge>
-                                    </td>
-                                    <td className="px-6 py-4 font-mono text-slate-500">{row.approver}</td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-2 font-mono text-primary cursor-pointer transition-all group">
-                                            <span className='group-hover:underline'>{row.cid}</span>
-                                            <span className="material-symbols-outlined text-[14px]">cloud_download</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 text-slate-500">{row.time}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                <RecentDeploymentsTable deployments={RecentDeployments} />
             </DashboardCard>
 
-            {/* Footer Status Bar */}
+           
             <footer className="mt-4 border-t border-slate-200 dark:border-slate-800 pt-3 flex flex-wrap justify-between items-center gap-4 text-[9px] font-black tracking-widest text-slate-500 uppercase">
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500/5 rounded border border-emerald-500/10">
                         <span className="size-1.5 rounded-full bg-emerald-500"></span>
-                        spanIPFS: ONLINE
+                        IPFS: ONLINE
                     </div>
                     <div className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500/5 rounded border border-emerald-500/10">
                         <span className="size-1.5 rounded-full bg-emerald-500"></span>

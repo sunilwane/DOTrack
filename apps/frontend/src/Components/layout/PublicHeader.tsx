@@ -92,14 +92,14 @@ export const PublicHeader: React.FC = () => {
                             className="hidden md:flex min-w-[120px]"
                             onClick={() => navigate("/connect")}
                         >
-                            Connect Wallet
+                            <span className="text-sm">Connect Wallet</span>
                         </Button>
                         <Button
                             variant="secondary"
                             className="min-w-[90px] sm:min-w-[100px]"
                             onClick={() => navigate("/login")}
                         >
-                            Sign In
+                            <span className="text-sm">Sign In</span>
                         </Button>
                     </div>
                 </div>

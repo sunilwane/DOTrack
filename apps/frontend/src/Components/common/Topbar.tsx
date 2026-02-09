@@ -13,7 +13,7 @@ function Topbar() {
             </div>
 
             <div className="flex items-center gap-4">
-                {/* Search Bar */}
+                
                 <label className="relative hidden md:flex items-center">
                     <span className="material-symbols-outlined absolute left-3 text-slate-500 text-lg">
                         search
@@ -24,7 +24,7 @@ function Topbar() {
                     />
                 </label>
 
-                {/* New Pipeline Button */}
+                
                 <Button 
                     variant="secondary" 
                     size="md" 
@@ -34,7 +34,7 @@ function Topbar() {
                     <span className="hidden sm:inline text-sm">New Pipeline</span>
                 </Button>
 
-                {/* User Profile */}
+               
                 <div className="size-10 rounded-full border-2 border-primary p-0.5 cursor-pointer hover:scale-105 transition-transform">
                     <div
                         className="w-full h-full rounded-full bg-center bg-cover bg-slate-800"

@@ -100,7 +100,7 @@
   line-height: 1;
 }
 
-/* Styles from Main */
+
 .node-bg {
   background-image: radial-gradient(circle at 2px 2px, rgba(13, 89, 242, 0.15) 1px, transparent 0);
   background-size: 40px 40px;
@@ -125,13 +125,13 @@ a:hover {
 body {
   margin: 0;
   display: block;
-  /* From HEAD: allow full width */
+  
   min-width: 320px;
   min-height: 100vh;
-  /* font-family is set in :root */
+  
 }
 
-/* Button styles from HEAD (Dashboard) */
+
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -146,11 +146,7 @@ button {
 button:hover {
   border-color: #646cff;
 }
-/* 
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-} */
+
 
 @media (prefers-color-scheme: light) {
   :root {
@@ -167,22 +163,14 @@ button:focus-visible {
   }
 }
 
-/* ========================================
-   CUSTOM STYLES FOR WEB3 DASHBOARD
-   ======================================== */
 
-/* Glass Panel Effect */
 .glass-panel {
   background: rgba(40, 46, 57, 0.4);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* ========================================
-   SCROLLER UTILITY CLASSES
-   ======================================== */
 
-/* Thin scrollbar style */
 .scrollbar-thin::-webkit-scrollbar {
   width: 4px;
   height: 4px;
@@ -201,7 +189,7 @@ button:focus-visible {
   background: #475569;
 }
 
-/* Hidden scrollbar */
+
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -211,17 +199,13 @@ button:focus-visible {
   display: none;
 }
 
-/* Firefox thin scrollbar */
+
 .scrollbar-thin {
   scrollbar-width: thin;
   scrollbar-color: #334155 transparent;
 }
 
-/* ========================================
-   LENIS SMOOTH SCROLL STYLES
-   ======================================== */
 
-/* Lenis root mode - apply scrollbar styles to html/body */
 html.lenis,
 html.lenis body {
   height: auto;
@@ -243,7 +227,7 @@ html.lenis.lenis-scrolling iframe {
   pointer-events: none;
 }
 
-/* Apply thin scrollbar to html when using Lenis root mode */
+
 html::-webkit-scrollbar {
   width: 4px;
 }
@@ -261,7 +245,7 @@ html::-webkit-scrollbar-thumb:hover {
   background: #475569;
 }
 
-/* Firefox */
+
 html {
   scrollbar-width: thin;
   scrollbar-color: #334155 transparent;

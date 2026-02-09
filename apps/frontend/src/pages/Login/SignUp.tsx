@@ -11,7 +11,7 @@ import { SignUpFields } from "../../mock/PagesMockData/AuthData";
 const SignUp: React.FC = () => {
     const navigate = useNavigate();
 
-    // TODO: Replace with real authentication flow
+    
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         navigate("/dashboard");

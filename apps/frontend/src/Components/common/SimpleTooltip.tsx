@@ -4,13 +4,13 @@ import { createPortal } from "react-dom";
 export type TooltipPlacement = "top" | "bottom" | "left" | "right";
 
 interface SimpleTooltipProps {
-    /** Text or ReactNode to display inside the tooltip */
+   
     label: React.ReactNode;
-    /** Tooltip placement relative to the trigger element */
+    
     placement?: TooltipPlacement;
-    /** Delay in ms before showing the tooltip */
+   
     delay?: number;
-    /** Additional className for the wrapper */
+    
     className?: string;
     children: React.ReactElement;
 }

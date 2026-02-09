@@ -11,7 +11,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     status,
     children,
     className = "",
-    // outline = false (unused)
+   
 }) => {
     const variants = {
         success: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
