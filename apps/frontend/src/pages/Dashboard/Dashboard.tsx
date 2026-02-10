@@ -2,13 +2,10 @@ import { StatusBadge } from '../../Components/common/StatusBadge';
 import { Button } from '../../Components/common/Button';
 import { DashboardCard } from '../../Components/common/DashboardCard';
 import { PipelineStages, RecentDeployments, DashboardStats } from '../../mock/PagesMockData/DashboardData';
-import { usePipelineAnimation } from './usePipelineAnimation';
 import PipelineTracker from './PipelineTracker';
 import RecentDeploymentsTable from './RecentDeploymentsTable';
 
 const Dashboard = () => {
-    const stages = usePipelineAnimation(PipelineStages);
-
     return (
         <div className="flex flex-col min-h-full p-0 space-y-0 max-w-7xl mx-auto w-full">
            
@@ -35,7 +32,7 @@ const Dashboard = () => {
                     </div>
                 </div>
                 <div className="ml-auto flex items-center gap-5">
-                    <button className="text-[9px] font-black uppercase tracking-widest rounded border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-primary hover:border-primary transition-colors cursor-pointer">
+                    <button className="text-[9px] font-black uppercase tracking-wider rounded border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-primary hover:border-primary transition-colors cursor-pointer">
                         <span className='text-sm'>Export CSV</span>
                     </button>
 
@@ -45,7 +42,7 @@ const Dashboard = () => {
                         className="h-8 text-[11px]"
                         icon={<span className="material-symbols-outlined text-[16px]">open_in_new</span>}
                     >
-                        Etherscan
+                        <span className='text-sm'>Etherscan</span>
                     </Button>
                 </div>
             </div>
@@ -59,7 +56,7 @@ const Dashboard = () => {
                     extra="Live Monitoring"
                     bodyClassName="p-6 min-h-[140px] flex items-center"
                 >
-                    <PipelineTracker stages={stages} />
+                    <PipelineTracker initialStages={PipelineStages} />
                 </DashboardCard>
 
                 

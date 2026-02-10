@@ -8,10 +8,20 @@ interface TimelineEntryProps {
     onToggleSelection: () => void;
     versionState: string;
     showConnector: boolean;
-    connectorState: string;
+    connectorProgress: number;
+    connectorDuration?: number;
 }
 
-export const TimelineEntry: React.FC<TimelineEntryProps> = ({ entry, isLast, isSelected, onToggleSelection, versionState, showConnector, connectorState }) => {
+export const TimelineEntry: React.FC<TimelineEntryProps> = ({ 
+    entry, 
+    isLast, 
+    isSelected, 
+    onToggleSelection, 
+    versionState, 
+    showConnector, 
+    connectorProgress,
+    connectorDuration = 1400 
+}) => {
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
     };
@@ -34,9 +44,15 @@ export const TimelineEntry: React.FC<TimelineEntryProps> = ({ entry, isLast, isS
                     </span>
                 </div>
                 {showConnector && (
-                    <div className={`w-[2px] h-full mt-2 transition-all duration-1000 ${
-                        connectorState === 'done' ? 'bg-primary' : 'bg-slate-200 dark:bg-slate-800'
-                    }`}></div>
+                    <div className="relative w-[2px] h-full mt-2 bg-slate-200 dark:bg-slate-800">
+                        <div 
+                            className="absolute top-0 left-0 w-full bg-primary"
+                            style={{ 
+                                height: `${connectorProgress}%`,
+                                transition: connectorProgress === 0 ? 'none' : `height ${connectorDuration}ms cubic-bezier(0.4, 0, 0.2, 1)`,
+                            }}
+                        />
+                    </div>
                 )}
             </div>
 

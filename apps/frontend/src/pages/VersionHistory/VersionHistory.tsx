@@ -1,77 +1,27 @@
 import * as React from "react";
-import { useState, useRef, useCallback } from "react";
+import { useState } from "react";
 import { mockVersions } from "../../mock/PagesMockData/versionHistory";
+import { useStageAnimation } from "../../Components/common/StageAnimation";
 import TimelineEntry from "./TimelineEntry";
 
 const VersionHistory: React.FC = () => {
     const [selectedVersions, setSelectedVersions] = useState<string[]>([]);
-    const [versionStates, setVersionStates] = useState<string[]>(() => {
-        const initial = mockVersions.map(() => 'pending');
-        initial[0] = 'active';
-        return initial;
-    });
     
-    const currentIndexRef = useRef(0);
-    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const isMountedRef = useRef(true);
-
-    const moveToNext = useCallback(() => {
-        if (!isMountedRef.current) return;
-        
-        const currentIdx = currentIndexRef.current;
-        const totalVersions = mockVersions.length;
-        
-        
-        setVersionStates(prev => {
-            const newStates = [...prev];
-            newStates[currentIdx] = 'done';
-            return newStates;
-        });
-        
-        
-        const nextIdx = currentIdx + 1;
-        currentIndexRef.current = nextIdx;
-        
-        if (nextIdx < totalVersions) {
-           
-            timeoutRef.current = setTimeout(() => {
-                if (!isMountedRef.current) return;
-                setVersionStates(prev => {
-                    const newStates = [...prev];
-                    newStates[nextIdx] = 'active';
-                    return newStates;
-                });
-               
-                timeoutRef.current = setTimeout(moveToNext, 3000);
-            }, 50);
-        } else {
-            
-            timeoutRef.current = setTimeout(() => {
-                if (!isMountedRef.current) return;
-                currentIndexRef.current = 0;
-                const resetStates = mockVersions.map(() => 'pending');
-                resetStates[0] = 'active';
-                setVersionStates(resetStates);
-                
-                timeoutRef.current = setTimeout(moveToNext, 3000);
-            }, 3000);
-        }
-    }, []);
-
-    React.useEffect(() => {
-        isMountedRef.current = true;
-        currentIndexRef.current = 0;
-        
-       
-        timeoutRef.current = setTimeout(moveToNext, 3000);
-
-        return () => {
-            isMountedRef.current = false;
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-            }
-        };
-    }, [moveToNext]);
+   
+    const stageItems = React.useMemo(() => 
+        mockVersions.map(v => ({
+            id: v.version,
+            label: v.title,
+        })),
+        []
+    );
+    
+    const { states } = useStageAnimation(stageItems, {
+        loadingDuration: 1500,
+        connectorDuration: 1400,
+        restartDelay: 2000,
+        loop: true,
+    });
 
     const toggleVersionSelection = (version: string) => {
         setSelectedVersions(prev => 
@@ -127,18 +77,25 @@ const VersionHistory: React.FC = () => {
             
             <div className="px-6 py-8">
                 <div className="flex flex-col relative">
-                    {mockVersions.map((entry, index) => (
-                        <TimelineEntry 
-                            key={entry.version}
-                            entry={entry}
-                            isLast={index === mockVersions.length - 1}
-                            isSelected={selectedVersions.includes(entry.version)}
-                            onToggleSelection={() => toggleVersionSelection(entry.version)}
-                            versionState={versionStates[index]}
-                            showConnector={index < mockVersions.length - 1}
-                            connectorState={versionStates[index]}
-                        />
-                    ))}
+                    {mockVersions.map((entry, index) => {
+                        const state = states.find(s => s.id === entry.version);
+                        const versionState = state?.status || 'pending';
+                        const progress = state?.connectorProgress || 0;
+                        
+                        return (
+                            <TimelineEntry 
+                                key={entry.version}
+                                entry={entry}
+                                isLast={index === mockVersions.length - 1}
+                                isSelected={selectedVersions.includes(entry.version)}
+                                onToggleSelection={() => toggleVersionSelection(entry.version)}
+                                versionState={versionState}
+                                showConnector={index < mockVersions.length - 1}
+                                connectorProgress={progress}
+                                connectorDuration={1400}
+                            />
+                        );
+                    })}
                 </div>
             </div>
 

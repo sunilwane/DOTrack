@@ -1,46 +1,42 @@
 import * as React from "react";
+import { StageTracker, useStageAnimation } from "../../Components/common/StageAnimation";
+import type { StageItem } from "../../Components/common/StageAnimation";
 import type { PipelineStage } from "types";
 
 interface Props {
-    stages: PipelineStage[];
+    initialStages: PipelineStage[];
 }
 
-export const PipelineTracker: React.FC<Props> = ({ stages }) => {
-    return (
-        <div className="flex items-center justify-between relative w-full px-4">
-            <div className="absolute top-1/2 left-0 w-full h-[1px] bg-slate-200 dark:bg-slate-700 -translate-y-1/2 z-0"></div>
-            <div
-                className="absolute top-1/2 left-0 h-[1px] bg-primary -translate-y-1/2 z-0 transition-all duration-1000"
-                style={{ width: `${stages.length > 1 ? (stages.filter(s => s.status === 'done').length / (stages.length - 1)) * 100 : 0}%` }}
-            ></div>
+export const PipelineTracker: React.FC<Props> = ({ initialStages }) => {
+    
+    const stageItems: StageItem[] = React.useMemo(() => 
+        initialStages.map(stage => ({
+            id: stage.id,
+            label: stage.label,
+            time: stage.time,
+            icon: stage.icon,
+            activeIcon: stage.id === 4 ? 'pen_size_2' : stage.id === 5 ? 'rocket_launch' : 'progress_activity',
+            doneIcon: stage.id === 3 ? 'verified_user' : 'check',
+        })),
+        [initialStages]
+    );
 
-            {stages.map((stage, index) => (
-                <div key={index} className={`relative z-10 flex flex-col items-center gap-3 transition-all duration-500 ${stage.status === 'pending' ? 'opacity-40' : ''}`}>
-                    <div
-                        className={
-                            `
-                                flex items-center justify-center shadow-lg transition-all duration-500
-                                ${stage.status === 'done' ? 'size-10 rounded-full bg-accent-emerald text-white' : ''}
-                                ${stage.status === 'active' ? 'size-12 rounded-full bg-primary text-white outline outline-4 outline-background-dark shadow-primary/20 scale-110' : ''}
-                                ${stage.status === 'pending' ? 'size-10 rounded-full bg-slate-700 text-slate-400' : ''}
-                            `
-                        }
-                    >
-                        <span className={`material-symbols-outlined text-[20px] ${stage.status === 'active' && stage.icon === 'progress_activity' ? 'animate-spin' : stage.status === 'active' && stage.icon === 'pen_size_2' ? 'animate-pulse' : ''}`}>
-                            {stage.icon}
-                        </span>
-                    </div>
-                    <div className="text-center">
-                        <p className={`text-[10px] font-bold uppercase tracking-tight ${stage.status === 'active' ? 'text-primary' : stage.status === 'pending' ? 'text-slate-500' : 'text-slate-900 dark:text-white'}`}>
-                            {stage.label}
-                        </p>
-                        <p className={`text-[9px] font-mono tracking-tighter ${stage.status === 'pending' ? 'text-slate-600' : 'text-slate-500'}`}>
-                            {stage.time}
-                        </p>
-                    </div>
-                </div>
-            ))}
-        </div>
+    const { states } = useStageAnimation(stageItems, {
+        loadingDuration: 1500,
+        connectorDuration: 1400,
+        restartDelay: 2000,
+        loop: true,
+    });
+
+    return (
+        <StageTracker
+            items={stageItems}
+            states={states}
+            orientation="horizontal"
+            showLabels={true}
+            showTime={true}
+            connectorDuration={1400}
+        />
     );
 };
 
