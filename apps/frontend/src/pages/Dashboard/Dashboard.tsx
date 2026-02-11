@@ -6,6 +6,7 @@ import PipelineTracker from './PipelineTracker';
 import RecentDeploymentsTable from './RecentDeploymentsTable';
 
 const Dashboard = () => {
+    console.warn("")
     return (
         <div className="flex flex-col min-h-full p-0 space-y-0 max-w-7xl mx-auto w-full">
            
