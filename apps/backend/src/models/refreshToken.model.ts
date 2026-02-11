@@ -16,7 +16,6 @@ const RefreshTokenSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// TTL index: Mongo will remove documents once expiresAt is reached
 RefreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 const RefreshTokenModel = mongoose.model<IRefreshToken>('RefreshToken', RefreshTokenSchema);

@@ -35,50 +35,7 @@ From the project root:
 pnpm install
 ```
 
-### 2. Backend Setup
 
-The backend `.env` is already configured with:
-```env
-MONGO_URI="mongodb+srv://..."
-JWT_SECRET="932813d84b4b9df536ba2b2d8fd99fc16a91e5cd960fdc02caa8b1ba005a8a3b"
-PORT=5000
-JWT_EXPIRES_IN=1h
-REFRESH_TOKEN_EXPIRES_IN=604800  # 7 days
-FRONTEND_URL=http://localhost:3000
-```
-
-Start backend:
-```bash
-cd apps/backend
-pnpm dev
-```
-
-You should see:
-```
-✅ MongoDB Connected: ...
-🚀 Server running on http://localhost:5000
-```
-
-### 3. Frontend Setup
-
-The frontend `.env` is configured with:
-```env
-VITE_API_BASE_URL=http://localhost:5000
-```
-
-Start frontend:
-```bash
-cd apps/frontend
-pnpm dev
-```
-
-You should see:
-```
-VITE ready in ...ms
-➜  Local:   http://localhost:3000/
-```
-
----
 
 ## 🧪 Testing the Auth Flow
 

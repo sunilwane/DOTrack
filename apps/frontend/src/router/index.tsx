@@ -5,8 +5,6 @@ import Projects from "../pages/Projects/Projects";
 import Deployments from "../pages/Deployments/Deployments";
 import Landing from "../pages/Landing/Landing";
 import SignIn from "../pages/Login/SignIn";
-import SignUp from "../pages/Login/SignUp";
-import ConnectWallet from "../pages/ConnectWallet/ConnectWallet";
 import AuditDashboard from "../pages/AuditLogs/AuditLogs";
 import Pipeline from "../pages/Pipeline/Pipeline";
 import AllProjects from "../pages/Projects/Projects";
@@ -22,10 +20,6 @@ export const AppRouter = () => {
 
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<SignIn />} />
-      <Route path="/signup" element={<SignUp />} />
-      <Route path="/connect" element={<ConnectWallet />} />
-
-      {/* Protected routes */}
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
 
@@ -41,7 +35,6 @@ export const AppRouter = () => {
         </Route>
       </Route>
 
-      {/* Catch-all redirect */}
       <Route path="*" element={<Navigate to="/" replace />} />
 
     </Routes>

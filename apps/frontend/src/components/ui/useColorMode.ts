@@ -8,7 +8,6 @@ export interface UseColorModeReturn {
   toggleColorMode: () => void
 }
 
-// custom hook
 export function useColorMode(): UseColorModeReturn {
   const { resolvedTheme, setTheme } = useTheme()
 

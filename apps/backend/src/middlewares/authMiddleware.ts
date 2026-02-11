@@ -14,7 +14,6 @@ export const requireAuth = async (req: AuthRequest, res: Response, next: NextFun
   const token = parts[1];
 
   try {
-    // check revoked
     const revoked = await RevokedTokenModel.findOne({ token });
     if (revoked) return res.status(401).json({ error: 'Token revoked' });
 

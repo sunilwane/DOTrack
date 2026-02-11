@@ -5,7 +5,6 @@ import { generateRefreshToken, hashToken } from '../utils/token';
 import jwt from 'jsonwebtoken';
 
 const SALT_ROUNDS = 12;
-// precompute a dummy hash to use when user not found (prevents timing/user-enum)
 import bcrypt from 'bcrypt';
 const DUMMY_HASH = bcrypt.hashSync('invalid-password-placeholder', SALT_ROUNDS);
 
@@ -14,7 +13,6 @@ export const createUser = async (payload: { email?: string; password?: string; n
   const normalizedEmail = payload.email.toLowerCase().trim();
   const existing = await UserModel.findOne({ email: normalizedEmail });
   if (existing) {
-    // Avoid revealing existence — return generic message
     throw new Error('Unable to process request');
   }
   const hashed = await hashPassword(payload.password);
@@ -25,11 +23,9 @@ export const createUser = async (payload: { email?: string; password?: string; n
 export const authenticateUser = async (payload: { email?: string; password?: string }) => {
   const normalizedEmail = (payload.email || '').toLowerCase().trim();
   const user = await UserModel.findOne({ email: normalizedEmail });
-  // always run a compare to make timing similar whether user exists or not
   const hashedToCompare = user ? user.password : DUMMY_HASH;
   const ok = await comparePassword(payload.password || '', hashedToCompare);
   if (!ok || !user) {
-    // generic error to avoid user enumeration
     throw new Error('Invalid credentials');
   }
 
@@ -38,10 +34,9 @@ export const authenticateUser = async (payload: { email?: string; password?: str
   const expiresIn = process.env.JWT_EXPIRES_IN || '1h';
   const accessToken = jwt.sign({ sub: user._id.toString(), email: user.email }, secret as any, { expiresIn: expiresIn as any });
 
-  // create refresh token (raw) and store hashed
   const rawRefreshToken = generateRefreshToken(64);
   const tokenHash = hashToken(rawRefreshToken);
-  const refreshExpiresSeconds = parseInt(process.env.REFRESH_TOKEN_EXPIRES_IN || '604800'); // default 7 days
+  const refreshExpiresSeconds = parseInt(process.env.REFRESH_TOKEN_EXPIRES_IN || '604800');
   const expiresAt = new Date(Date.now() + refreshExpiresSeconds * 1000);
   await RefreshTokenModel.create({ userId: user._id, tokenHash, expiresAt });
 
@@ -52,9 +47,7 @@ export const rotateRefreshToken = async (oldRawToken: string, userId: string) =>
   const oldHash = hashToken(oldRawToken);
   const doc = await RefreshTokenModel.findOne({ tokenHash: oldHash, userId });
   if (!doc) return null;
-  // remove old
   await RefreshTokenModel.deleteOne({ _id: doc._id });
-  // create new
   const newRaw = generateRefreshToken(64);
   const newHash = hashToken(newRaw);
   const refreshExpiresSeconds = parseInt(process.env.REFRESH_TOKEN_EXPIRES_IN || '604800');
@@ -79,7 +72,6 @@ export const findOrCreateUserByGoogle = async (email?: string, name?: string) =>
   const normalizedEmail = email.toLowerCase().trim();
   let user = await UserModel.findOne({ email: normalizedEmail });
   if (user) return user;
-  // create a random password for oauth users
   const random = generateRefreshToken(32);
   const hashed = await hashPassword(random);
   user = await UserModel.create({ email: normalizedEmail, password: hashed, name });

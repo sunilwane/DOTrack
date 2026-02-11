@@ -36,7 +36,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check if user is authenticated on mount
   useEffect(() => {
     const initializeAuth = async () => {
       const token = authService.getAccessToken();
@@ -47,7 +46,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUser(userData);
         } catch (error) {
           console.error('Failed to fetch user:', error);
-          // Try to refresh token
           try {
             await authService.refresh();
             const { user: userData } = await authService.getMe();
@@ -59,14 +57,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }
         }
       } else {
-        // No access token found — attempt refresh in case a refresh cookie exists (e.g. after OAuth redirect)
         try {
           await authService.refresh();
           const { user: userData } = await authService.getMe();
           setUser(userData);
         } catch (err) {
-          // Not authenticated
-          setUser(null);
         }
       }
 
@@ -90,8 +85,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signup = async (data: SignUpData) => {
     try {
       await authService.signup(data);
-      // After signup, automatically sign in
-      await signin({ email: data.email, password: data.password });
+      const { user: userData } = await authService.getMe();
+      setUser(userData);
     } catch (error) {
       console.error('Signup error:', error);
       throw error;

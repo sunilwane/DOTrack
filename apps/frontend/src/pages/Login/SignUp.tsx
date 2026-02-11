@@ -15,7 +15,6 @@ const SignUp: React.FC = () => {
     const [error, setError] = React.useState<string | null>(null);
     const [loading, setLoading] = React.useState(false);
 
-    // Redirect if already authenticated
     React.useEffect(() => {
         if (!isLoading && isAuthenticated) {
             navigate('/dashboard', { replace: true });

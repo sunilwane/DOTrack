@@ -16,7 +16,6 @@ app.use(express.json());
 app.use(cookieParser());
 registerRoutes(app);
 
-// Global error handler
 app.use(errorHandler);
 
 const startServer = async () => {

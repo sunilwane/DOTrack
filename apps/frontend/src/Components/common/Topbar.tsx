@@ -9,7 +9,6 @@ function Topbar() {
     const [showMenu, setShowMenu] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
-    // Close menu when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -63,10 +62,8 @@ function Topbar() {
                     <span className="hidden sm:inline text-sm">New Pipeline</span>
                 </Button>
 
-                {/* User Profile Menu */}
                 <div className="relative" ref={menuRef}>
                     <div className="relative">
-                        {/* Gradient border wrapper (yellow) */}
                         <div 
                             className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 p-0.5"
                             style={{
@@ -93,10 +90,8 @@ function Topbar() {
                         </button>
                     </div>
 
-                    {/* Dropdown Menu */}
                     {showMenu && (
                         <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-slate-900 rounded-lg shadow-lg border border-slate-200 dark:border-slate-800 py-2 z-50">
-                            {/* User Info */}
                             <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800">
                                 <p className="text-sm font-semibold text-slate-900 dark:text-white">
                                     {user?.email || 'User'}
@@ -106,12 +101,10 @@ function Topbar() {
                                 </p>
                             </div>
 
-                            {/* Menu Items */}
                             <div className="py-1">
                                 <button
                                     onClick={() => {
                                         setShowMenu(false);
-                                        // Profile is dummy - just close menu
                                     }}
                                     className="w-full px-4 py-2 text-left text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-3 transition-colors"
                                 >

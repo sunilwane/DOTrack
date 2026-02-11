@@ -13,7 +13,6 @@ const RevokedTokenSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// TTL index to auto-remove expired tokens
 RevokedTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 const RevokedTokenModel = mongoose.model<IRevokedToken>('RevokedToken', RevokedTokenSchema);

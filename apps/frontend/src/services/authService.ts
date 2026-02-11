@@ -52,7 +52,7 @@ class AuthService {
     const response = await fetch(`${API_BASE_URL}/api/auth/signin`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include', // Important: send/receive cookies
+      credentials: 'include',
       body: JSON.stringify(data),
     });
 
@@ -63,7 +63,6 @@ class AuthService {
 
     const result = await response.json();
     
-    // Store access token in localStorage
     if (result.accessToken) {
       localStorage.setItem('accessToken', result.accessToken);
     }
@@ -75,7 +74,6 @@ class AuthService {
     const token = localStorage.getItem('accessToken');
     
     if (!token) {
-      // Clear local data even if no token
       localStorage.removeItem('accessToken');
       return;
     }
@@ -84,7 +82,7 @@ class AuthService {
       const response = await fetch(`${API_BASE_URL}/api/auth/signout`, {
         method: 'POST',
         headers: this.getAuthHeaders(),
-        credentials: 'include', // Important: send refresh token cookie
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -93,7 +91,6 @@ class AuthService {
     } catch (error) {
       console.error('Signout error:', error);
     } finally {
-      // Always clear local storage
       localStorage.removeItem('accessToken');
     }
   }
@@ -101,7 +98,7 @@ class AuthService {
   async refresh(): Promise<AuthResponse> {
     const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
       method: 'POST',
-      credentials: 'include', // Important: send refresh token cookie
+      credentials: 'include',
     });
 
     if (!response.ok) {

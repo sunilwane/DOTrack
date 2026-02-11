@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import { signupSchema, signinSchema } from '../utils/validators';
 import UserModel from '../models/user.model';
 import { getRefreshCookieOptions } from '../utils/cookies';
+import { AuthRequest } from '../middlewares/authMiddleware';
 
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -14,7 +15,6 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
     res.status(201).json(user);
   } catch (err) {
     console.error('signup error', err);
-    // Hide internal messages
     res.status(400).json({ error: 'Unable to complete request' });
   }
 };
@@ -29,7 +29,6 @@ export const signin = async (req: Request, res: Response, next: NextFunction) =>
     res.json({ accessToken });
   } catch (err) {
     console.error('signin error', err);
-    // generic message to avoid user enumeration
     res.status(401).json({ error: 'Invalid credentials' });
   }
 };
@@ -42,12 +41,10 @@ export const signout = async (req: Request, res: Response, next: NextFunction) =
     if (parts.length !== 2 || parts[0] !== 'Bearer') return res.status(400).json({ error: 'Invalid authorization header' });
     const token = parts[1];
 
-    // decode to get expiry
     const decoded = jwt.decode(token) as any;
     const exp = decoded?.exp ? new Date(decoded.exp * 1000) : new Date(Date.now() + 60 * 60 * 1000);
 
     await RevokedTokenModel.create({ token, expiresAt: exp });
-    // also revoke refresh token cookie if present
     const raw = (req as any).cookies?.refreshToken;
     if (raw) {
       await authService.revokeRefreshToken(raw);
@@ -61,10 +58,7 @@ export const signout = async (req: Request, res: Response, next: NextFunction) =
   }
 };
 
-export const me = async (req: Request, res: Response) => {
-  // requireAuth middleware populates req.user
-  // return the decoded payload only
-  // @ts-ignore
+export const me = async (req: AuthRequest, res: Response) => {
   const payload = req.user;
   res.json({ user: payload });
 };
@@ -119,7 +113,6 @@ export const googleCallback = async (req: Request, res: Response, next: NextFunc
     const frontend = process.env.FRONTEND_URL || 'http://localhost:3000';
 
     if (!code) return res.status(400).json({ error: 'Missing code' });
-    // Exchange code for tokens
     const params = new URLSearchParams();
     params.append('code', code);
     params.append('client_id', clientId);
@@ -127,7 +120,6 @@ export const googleCallback = async (req: Request, res: Response, next: NextFunc
     params.append('redirect_uri', callback);
     params.append('grant_type', 'authorization_code');
 
-    // @ts-ignore - using global fetch
     const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -138,7 +130,6 @@ export const googleCallback = async (req: Request, res: Response, next: NextFunc
     const idToken = tokenJson.id_token as string | undefined;
     if (!idToken) return res.status(400).json({ error: 'Unable to verify google identity' });
 
-    // decode id_token to extract email/name
     const decoded = require('jsonwebtoken').decode(idToken) as any;
     const email = decoded?.email;
     const name = decoded?.name;
@@ -147,7 +138,6 @@ export const googleCallback = async (req: Request, res: Response, next: NextFunc
     const user = await authService.findOrCreateUserByGoogle(email, name);
     const tokens = await authService.createTokensForUser(user as any);
 
-    // set refresh cookie and redirect back to frontend
     const cookieOptions = getRefreshCookieOptions();
     res.cookie('refreshToken', tokens.refreshToken, cookieOptions);
 
@@ -157,11 +147,9 @@ export const googleCallback = async (req: Request, res: Response, next: NextFunc
         const parsed = JSON.parse(decodeURIComponent(state));
         if (parsed?.returnTo) returnTo = parsed.returnTo;
       } catch (e) {
-        // ignore
       }
     }
 
-    // redirect to frontend; frontend should call /api/auth/refresh to obtain access token
     res.redirect(`${frontend}${returnTo}`);
   } catch (err) {
     next(err);
