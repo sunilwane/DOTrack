@@ -6,7 +6,8 @@
   "scripts": {
     "dev:frontend": "pnpm --filter frontend dev",
     "dev:backend": "pnpm --filter backend dev",
-    "dev": "pnpm run dev:frontend & pnpm run dev:backend"
+    "dev": "pnpm run dev:frontend & pnpm run dev:backend",
+    "lint": "pnpm -r lint"
   },
   "keywords": [],
   "author": "",
@@ -18,5 +19,8 @@
     "framer-motion": "^12.31.0",
     "lucide-react": "^0.563.0",
     "material-symbols": "^0.40.2"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.2"
   }
 }

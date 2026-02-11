@@ -1,7 +1,9 @@
 import * as React from "react";
 import type { ProjectCardData } from "../../mock/PagesMockData/projects";
 
-interface ProjectCardProps extends ProjectCardData {}
+interface ProjectCardProps extends ProjectCardData {
+    _?: never;
+}
 
 const ProjectCard: React.FC<ProjectCardProps> = ({
     name,
