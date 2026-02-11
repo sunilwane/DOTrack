@@ -1,12 +1,12 @@
 import * as React from "react";
 import { Button } from "../../Components/common/Button";
 import { mockRegisterProjectData, mockRegistrationSteps } from "../../mock/PagesMockData/registerProjects";
-import ProgressSection from "./ProgressSection";
-import StepsIndicator from "./StepsIndicator";
-import RegistrationSummary from "./RegistrationSummary";
-import GasEstimateCard from "./GasEstimateCard";
 
 const RegisterProject: React.FC = () => {
+
+    const test = "hello"
+
+     console.log(test)
     return (
         <main className="flex-1 flex justify-center py-12 px-4 w-full">
             <div className="w-full max-w-[1000px] flex flex-col gap-8">

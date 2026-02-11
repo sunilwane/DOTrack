@@ -22,7 +22,7 @@ const highlightYaml = (code: string): React.ReactNode[] => {
   const lines = code.split("\n");
   return lines.map((line, lineIdx) => {
     const tokens: React.ReactNode[] = [];
-    let remaining = line;
+    const remaining = line;
     let keyIdx = 0;
 
     if (remaining.trim().startsWith("#")) {
@@ -146,7 +146,7 @@ const highlightJson = (code: string): React.ReactNode[] => {
   const lines = code.split("\n");
   return lines.map((line, lineIdx) => {
     const tokens: React.ReactNode[] = [];
-    let remaining = line;
+    const remaining = line;
     let keyIdx = 0;
 
     const parts = remaining.split(
