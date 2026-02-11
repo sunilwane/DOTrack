@@ -1,4 +1,3 @@
-import * as React from "react";
 import {
     Table,
     TableHeader,
@@ -11,17 +10,7 @@ import {
     CardBody
 } from "@heroui/react";
 
-export interface AuditEntry {
-    id: string;
-    timestamp: string;
-    block: string;
-    event: string;
-    wallet: string;
-    ipfs: string;
-    proof: string;
-    proofHash?: string;
-    status: string;
-}
+import type { AuditEntry } from "types";
 
 interface AuditTableProps {
     title: string;

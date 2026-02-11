@@ -1,8 +1,4 @@
 import * as React from "react";
-import {
-    Chip,
-    Button,
-} from "@heroui/react";
 import { Folder, Link as LinkIcon, Calendar, ChevronDown, RefreshCw } from "lucide-react";
 
 import { Check } from "lucide-react";
