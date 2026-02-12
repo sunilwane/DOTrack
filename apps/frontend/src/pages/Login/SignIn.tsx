@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AuthLayout } from "../../Components/layout/AuthLayout";
 import { Button } from "../../Components/common/Button";
 import { Input } from "../../Components/common/Input";
@@ -80,7 +80,7 @@ const SignIn: React.FC = () => {
 
             <div className="mt-8 text-center">
                 <p className="text-sm text-slate-500 mb-4">
-                    New here? <Link to="/signup" className="text-primary hover:underline font-bold cursor-pointer">Create an account</Link>
+                    New here? <button type="button" onClick={() => navigate('/signup')} className="text-primary hover:underline font-bold cursor-pointer">Create an account</button>
                 </p>
                 <div className="pt-6 border-t border-slate-200 dark:border-slate-800">
                     <Button

@@ -5,6 +5,7 @@ dist
 
 # Environment files (ignore any .env anywhere)
 .env.*
+!.env.example
 
 
 

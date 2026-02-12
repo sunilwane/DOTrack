@@ -78,6 +78,41 @@ export const findOrCreateUserByGoogle = async (email?: string, name?: string) =>
   return user;
 };
 
+export const findOrCreateUserByGithub = async (
+  email?: string,
+  name?: string,
+  githubId?: string,
+  githubUsername?: string,
+  githubAccessToken?: string
+) => {
+  if (!email) throw new Error('Email required');
+  const normalizedEmail = email.toLowerCase().trim();
+  let user = await UserModel.findOne({ email: normalizedEmail });
+  if (user) {
+    // update github fields if provided
+    const updates: any = {};
+    if (githubId) updates.githubId = githubId;
+    if (githubUsername) updates.githubUsername = githubUsername;
+    if (githubAccessToken) updates.githubAccessToken = githubAccessToken;
+    if (Object.keys(updates).length > 0) {
+      await UserModel.updateOne({ _id: user._id }, { $set: updates });
+      user = await UserModel.findById(user._id);
+    }
+    return user;
+  }
+  const random = generateRefreshToken(32);
+  const hashed = await hashPassword(random);
+  const created = await UserModel.create({
+    email: normalizedEmail,
+    password: hashed,
+    name,
+    githubId,
+    githubUsername,
+    githubAccessToken,
+  });
+  return created;
+};
+
 export const createTokensForUser = async (user: any) => {
   const secret = process.env.JWT_SECRET;
   if (!secret) throw new Error('JWT_SECRET not set');

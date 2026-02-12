@@ -1,9 +1,12 @@
 import * as React from "react";
+import { useNavigate } from "react-router-dom";
 import { AuthLayout } from "../../Components/layout/AuthLayout";
+import { Button } from "../../Components/common/Button";
 import { WalletOptionCard } from "./WalletOptionCard";
 import { WalletOptions } from "../../mock/PagesMockData/WalletData";
 
 const ConnectWallet: React.FC = () => {
+    const navigate = useNavigate();
     
     const isConnected = false; 
     const isPolygonMainnet = false; 

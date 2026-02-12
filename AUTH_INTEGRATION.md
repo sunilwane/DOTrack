@@ -216,6 +216,82 @@ Optional enhancements you could add:
 
 ---
 
+## **Continue with GitHub (Social Login) — Implementation Details**
+
+- **Overview:** The project implements GitHub OAuth as a social sign-in option. The flow is initiated from the frontend, handled by backend endpoints, and results in a local account (created if needed) with a stored GitHub access token on the user record.
+
+- **Env vars (DO NOT COMMIT VALUES):**
+   - `GITHUB_CLIENT_ID` — GitHub OAuth App client ID
+   - `GITHUB_CLIENT_SECRET` — GitHub OAuth App client secret (keep secret)
+   - `GITHUB_CALLBACK_URL` — Backend callback URL registered in the GitHub app
+   - `FRONTEND_URL` — Frontend base URL (used to redirect after login)
+
+- **Frontend trigger:**
+   - The SocialAuth button builds an anchor to the backend: [apps/frontend/src/Components/common/SocialAuth.tsx](apps/frontend/src/Components/common/SocialAuth.tsx#L1-L40)
+   - Example href: `${VITE_API_BASE_URL}/api/auth/github?returnTo=${encodeURIComponent(returnTo)}`
+   - Clicking this link performs a full-page redirect to the backend `GET /api/auth/github` endpoint.
+
+- **Backend: `GET /api/auth/github` (redirect to GitHub)**
+   - Reads `GITHUB_CLIENT_ID` and `GITHUB_CALLBACK_URL` from env.
+   - Accepts optional `returnTo` query param (frontend route to return to after login).
+   - Encodes `state` as JSON (currently contains `{ returnTo }`) and passes it through GitHub's `state` parameter.
+   - Requests these scopes: `read:user repo user:email`.
+   - Redirects the browser to the GitHub authorization URL:
+      `https://github.com/login/oauth/authorize?client_id=...&redirect_uri=...&scope=...&state=...`
+
+- **Backend: callback — `GET /api/auth/github/callback`**
+   - GitHub returns a `code` (authorization code) and the same `state`.
+   - Backend exchanges the `code` for an access token by POSTing to `https://github.com/login/oauth/access_token` with `client_id`, `client_secret`, `code`, and `redirect_uri`.
+   - The request uses `Accept: application/json` and expects `access_token` in the response.
+
+- **Fetch GitHub user info**
+   - With the `access_token`, backend calls `https://api.github.com/user` to get `name`, `login`, `id`, and possibly `email`.
+   - If `email` is not present on the `/user` response, the backend calls `https://api.github.com/user/emails` to obtain primary/verified email.
+
+- **Create / update local user**
+   - Backend calls `authService.findOrCreateUserByGithub(email, name, githubId, githubUsername, accessToken)` which:
+      - Finds an existing user by normalized email and updates GitHub fields, or
+      - Creates a new user with a randomly-generated local password (so the account can exist without a password the user entered).
+   - The GitHub access token is saved on the user record field `githubAccessToken` (see `apps/backend/src/services/authService.ts`).
+
+- **Local tokens & cookie**
+   - After user creation/update the backend creates standard JWT access token + refresh token via `createTokensForUser`.
+   - The refresh token is set as an HttpOnly cookie using `getRefreshCookieOptions()` (path `/api/auth`). See [apps/backend/src/utils/cookies.ts](apps/backend/src/utils/cookies.ts#L1-L40).
+   - Finally the backend redirects the browser to `${FRONTEND_URL}${returnTo}`.
+
+- **Scopes explained:**
+   - `read:user` — read profile information (name, login, avatar)
+   - `user:email` — read a user's email addresses (needed when public email is not set)
+   - `repo` — read access to repositories (used later by `GET /api/auth/github/repos`)
+
+- **Security & best practices**
+   - Never store `GITHUB_CLIENT_SECRET` in the repository — keep it in your environment or secrets manager.
+   - The `state` parameter is used to carry `returnTo` — for stronger CSRF protection you can include a server-generated nonce in `state` and verify it on callback.
+   - The GitHub access token is stored on the user document so the app can call GitHub APIs on behalf of the user (e.g., list repos). Treat that token as sensitive.
+   - Refresh token cookie is HttpOnly and scoped to `/api/auth` to limit exposure.
+
+- **GitHub OAuth App setup (quick guide)**
+   1. In GitHub, go to Settings → Developer settings → OAuth Apps → New OAuth App.
+   2. Set the **Homepage URL** to your frontend `FRONTEND_URL` (e.g., `http://localhost:3000`).
+   3. Set the **Authorization callback URL** to your backend `GITHUB_CALLBACK_URL` (e.g., `http://localhost:5000/api/auth/github/callback`).
+   4. Create the app and copy `Client ID` and `Client Secret` into your environment variables (`GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`).
+
+- **Testing the flow locally**
+   - Start backend and frontend.
+   - Click "Continue with GitHub" on the login page (SocialAuth button): [apps/frontend/src/Components/common/SocialAuth.tsx](apps/frontend/src/Components/common/SocialAuth.tsx#L1-L40).
+   - Complete GitHub consent screen; confirm redirect lands back on the frontend route you expected.
+   - Verify in the backend logs that a new or existing user was linked and that a refresh cookie was set.
+   - Confirm you can fetch repos via `GET /api/auth/github/repos` (requires logged-in user with stored `githubAccessToken`).
+
+- **Troubleshooting**
+   - If `access_token` is not returned: verify `client_id`, `client_secret`, and `redirect_uri` match the GitHub app settings.
+   - If no email found: ensure the GitHub account has at least one verified email or the `user:email` scope is present.
+   - If redirect fails with CORS or cookie issues: check `FRONTEND_URL`, cookie `path` (`/api/auth`) and `credentials`/CORS settings.
+
+---
+
+---
+
 ## 📂 New Files Created
 
 - `apps/frontend/src/services/authService.ts` - API service layer

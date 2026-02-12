@@ -155,3 +155,105 @@ export const googleCallback = async (req: Request, res: Response, next: NextFunc
     next(err);
   }
 };
+
+export const githubAuth = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const clientId = process.env.GITHUB_CLIENT_ID;
+    const callback = process.env.GITHUB_CALLBACK_URL;
+    if (!clientId || !callback) return res.status(500).json({ error: 'GitHub OAuth not configured' });
+    const returnTo = (req.query.returnTo as string) || '/';
+    const frontend = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const state = encodeURIComponent(JSON.stringify({ returnTo }));
+    const url = `https://github.com/login/oauth/authorize?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(callback)}&scope=${encodeURIComponent('read:user repo user:email')}&state=${state}`;
+    res.redirect(url);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const githubCallback = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const code = req.query.code as string | undefined;
+    const state = req.query.state as string | undefined;
+    const clientId = process.env.GITHUB_CLIENT_ID as string;
+    const clientSecret = process.env.GITHUB_CLIENT_SECRET as string;
+    const callback = process.env.GITHUB_CALLBACK_URL as string;
+    const frontend = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+    if (!code) return res.status(400).json({ error: 'Missing code' });
+
+    const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ client_id: clientId, client_secret: clientSecret, code, redirect_uri: callback }),
+    });
+
+    const tokenJson = await tokenRes.json();
+    const accessToken = tokenJson.access_token as string | undefined;
+    if (!accessToken) return res.status(400).json({ error: 'Unable to obtain access token from GitHub' });
+
+    // Fetch user
+    const userRes = await fetch('https://api.github.com/user', {
+      headers: { Authorization: `token ${accessToken}`, Accept: 'application/vnd.github.v3+json' },
+    });
+    const userJson = await userRes.json();
+    const email = userJson?.email as string | undefined;
+    const name = userJson?.name || userJson?.login;
+    const githubId = userJson?.id ? String(userJson.id) : undefined;
+    const githubUsername = userJson?.login;
+
+    // If email not present, fetch emails endpoint
+    let primaryEmail = email;
+    if (!primaryEmail) {
+      const emailsRes = await fetch('https://api.github.com/user/emails', {
+        headers: { Authorization: `token ${accessToken}`, Accept: 'application/vnd.github.v3+json' },
+      });
+      const emailsJson = await emailsRes.json();
+      if (Array.isArray(emailsJson)) {
+        const primary = emailsJson.find((e: any) => e.primary) || emailsJson[0];
+        primaryEmail = primary?.email;
+      }
+    }
+
+    const user = await authService.findOrCreateUserByGithub(primaryEmail, name, githubId, githubUsername, accessToken);
+    const tokens = await authService.createTokensForUser(user as any);
+
+    const cookieOptions = getRefreshCookieOptions();
+    res.cookie('refreshToken', tokens.refreshToken, cookieOptions);
+
+    let returnTo = '/';
+    if (state) {
+      try {
+        const parsed = JSON.parse(decodeURIComponent(state));
+        if (parsed?.returnTo) returnTo = parsed.returnTo;
+      } catch (e) {}
+    }
+
+    res.redirect(`${frontend}${returnTo}`);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getGithubRepos = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const payload = req.user as any;
+    if (!payload?.sub) return res.status(401).json({ error: 'Unauthorized' });
+    const user = await UserModel.findById(payload.sub);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    const token = (user as any).githubAccessToken;
+    if (!token) return res.status(400).json({ error: 'No GitHub access token available' });
+
+    const reposRes = await fetch('https://api.github.com/user/repos?per_page=100', {
+      headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
+    });
+    if (!reposRes.ok) {
+      const text = await reposRes.text();
+      return res.status(502).json({ error: 'Failed to fetch repos', details: text });
+    }
+    const reposJson = await reposRes.json();
+    res.json(reposJson);
+  } catch (err) {
+    next(err);
+  }
+};
