@@ -5,16 +5,51 @@ import { Button } from "../../Components/common/Button";
 import { Input } from "../../Components/common/Input";
 import { SocialAuth } from "../../Components/common/SocialAuth";
 import { Divider } from "../../Components/common/Divider";
-
+import { useAuth } from "../../contexts/AuthContext";
+import { authService } from '../../services/authService';
 import { SignUpFields } from "../../mock/PagesMockData/AuthData";
 
 const SignUp: React.FC = () => {
     const navigate = useNavigate();
+    const { isAuthenticated, isLoading } = useAuth();
+    const [error, setError] = React.useState<string | null>(null);
+    const [loading, setLoading] = React.useState(false);
 
-    
-    const handleSubmit = (e: React.FormEvent) => {
+    React.useEffect(() => {
+        if (!isLoading && isAuthenticated) {
+            navigate('/dashboard', { replace: true });
+        }
+    }, [isAuthenticated, isLoading, navigate]);
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-screen bg-background-light dark:bg-background-dark">
+                <div className="text-center">
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                    <p className="mt-4 text-slate-600 dark:text-slate-400">Loading...</p>
+                </div>
+            </div>
+        );
+    }
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        navigate("/dashboard");
+        setError(null);
+        setLoading(true);
+
+        const formData = new FormData(e.target as HTMLFormElement);
+        const name = formData.get('name') as string;
+        const email = formData.get('email') as string;
+        const password = formData.get('password') as string;
+
+        try {
+            await authService.signup({ name, email, password });
+            navigate('/login');
+        } catch (err: any) {
+            setError(err.message || 'Sign up failed. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -28,9 +63,15 @@ const SignUp: React.FC = () => {
             <Divider>or use email</Divider>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
+                {error && (
+                    <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+                    </div>
+                )}
                 {SignUpFields.map((field, index) => (
                     <Input
                         key={index}
+                        name={field.id}
                         {...field}
                     />
                 ))}
@@ -47,8 +88,8 @@ const SignUp: React.FC = () => {
                     </label>
                 </div>
 
-                <Button type="submit" className="w-full mt-4" size="lg">
-                    Create Account
+                <Button type="submit" className="w-full mt-4" size="lg" disabled={loading}>
+                    {loading ? 'Creating Account...' : 'Create Account'}
                 </Button>
             </form>
 

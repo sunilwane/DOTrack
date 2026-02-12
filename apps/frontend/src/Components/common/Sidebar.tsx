@@ -114,11 +114,9 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
             <div className="flex flex-col gap-10 flex-1 min-h-0">
 
                 <div className={`flex items-center ${isCollapsed ? 'flex-col justify-center gap-4' : 'gap-3'} transition-all duration-300`}>
-                    <button
-                        type="button"
-                        className={`flex items-center gap-3 ${isCollapsed ? 'hidden' : 'flex'} cursor-pointer bg-transparent border-none p-0 text-left flex-1 focus:outline-none`}
-                        onClick={() => navigate("/")}
-                        aria-label="Navigate to home"
+                    <div
+                        className={`flex items-center gap-3 ${isCollapsed ? 'hidden' : 'flex'} bg-transparent border-none p-0 text-left flex-1`}
+                        aria-hidden={true}
                     >
                         <Logo className="size-9 text-primary shrink-0" />
                         <div className="flex flex-col whitespace-nowrap overflow-hidden">
@@ -127,17 +125,12 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                                 Web3 DevOps
                             </p>
                         </div>
-                    </button>
+                    </div>
 
                     {isCollapsed && (
-                        <button
-                            type="button"
-                            className="cursor-pointer bg-transparent border-none p-0 focus:outline-none"
-                            onClick={() => navigate("/")}
-                            aria-label="Navigate to home"
-                        >
+                        <div className="cursor-default bg-transparent border-none p-0 focus:outline-none" aria-hidden={true}>
                             <Logo className="size-9 text-primary shrink-0" />
-                        </button>
+                        </div>
                     )}
 
                     <button
