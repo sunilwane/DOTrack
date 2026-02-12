@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useLenis } from "lenis/react";
 import type { TemplateCard } from "types";
 
 interface ConfirmPopUpProps {
@@ -8,27 +9,40 @@ interface ConfirmPopUpProps {
   template: TemplateCard | null;
 }
 
-export const ConfirmPopUp: React.FC<ConfirmPopUpProps> = ({ 
-  isOpen, 
-  onClose, 
-  onConfirm, 
-  template 
+export const ConfirmPopUp: React.FC<ConfirmPopUpProps> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  template
 }) => {
+  const lenis = useLenis();
+
+  useEffect(() => {
+    if (isOpen && lenis) {
+      lenis.stop();
+    } else if (lenis) {
+      lenis.start();
+    }
+    return () => {
+      if (lenis) lenis.start();
+    };
+  }, [isOpen, lenis]);
+
   if (!isOpen || !template) return null;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <div className="w-full max-w-[440px] bg-[#1a1f2e] border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 mx-auto">
-        <div className="flex items-center justify-between p-6 border-b border-white/5">
+        <div className="flex items-center justify-between p-5 border-b border-white/5">
           <h3 className="text-base font-bold font-display text-white">Confirm Deployment Approval</h3>
-          <button 
-            className="text-white/40 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/5"
+          <button
+            className="text-white/20 hover:text-white transition-colors rounded-lg hover:bg-white/5"
             onClick={onClose}
           >
-            <span className="material-symbols-outlined">close</span>
+            <span className="material-symbols-outlined pt-2">close</span>
           </button>
         </div>
-        
+
         <div className="p-6 flex flex-col gap-6">
           <div className="space-y-3">
             <div className="flex flex-col gap-1">
@@ -37,7 +51,7 @@ export const ConfirmPopUp: React.FC<ConfirmPopUpProps> = ({
                 {template.title}
               </p>
             </div>
-            
+
             <div className="flex flex-col gap-1">
               <span className="text-[8px] uppercase tracking-widest text-white/40 font-bold">Pipeline Hash (IPFS)</span>
               <div className="flex items-center justify-between text-[10px] font-mono text-primary bg-primary/5 p-3 rounded-lg border border-primary/10">
@@ -46,7 +60,7 @@ export const ConfirmPopUp: React.FC<ConfirmPopUpProps> = ({
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white/5 p-4 rounded-xl border border-white/5">
             <div className="flex items-center gap-3 mb-1">
               <span className="material-symbols-outlined text-primary text-xl">account_tree</span>
@@ -56,7 +70,7 @@ export const ConfirmPopUp: React.FC<ConfirmPopUpProps> = ({
               Executing Smart Contract: <span className="text-primary">DeployApprove()</span>
             </p>
           </div>
-          
+
           <div className="flex justify-between items-center px-1">
             <div className="flex flex-col">
               <span className="text-[8px] uppercase tracking-widest text-white/40 font-bold">Estimated Gas Fee</span>
@@ -69,22 +83,22 @@ export const ConfirmPopUp: React.FC<ConfirmPopUpProps> = ({
               <span className="material-symbols-outlined text-sm">speed</span> Likely &lt; 30s
             </div>
           </div>
-          
+
           <div className="flex gap-3 bg-amber-500/10 border border-amber-500/20 p-4 rounded-xl">
             <span className="material-symbols-outlined text-amber-500 shrink-0">warning</span>
             <p className="text-[10px] text-amber-200/80 leading-relaxed">
               This action is immutable and will trigger CI/CD pipeline execution. Ensure source repository is secure.
             </p>
           </div>
-          
+
           <div className="flex gap-3 pt-2">
-            <button 
+            <button
               className="flex-1 py-3 px-4 rounded-xl text-white font-bold text-xs hover:bg-white/5 transition-colors"
               onClick={onClose}
             >
               Reject
             </button>
-            <button 
+            <button
               className="flex-1 py-3 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20"
               onClick={onConfirm}
             >

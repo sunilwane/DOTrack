@@ -12,7 +12,7 @@ import AllProjects from "../pages/Projects/Projects";
 import RegisterProject from "../pages/RegisterProject/RegisterProject";
 import VersionHistory from "../pages/VersionHistory/VersionHistory";
 import MarketPlace from "../pages/Marketplace/Marketplace";
-
+import Blockchain from "../pages/Blockchain/Blockchain";
 import { AppLayout } from "../Components/layout/AppLayout";
 
 export const AppRouter = () => {
@@ -24,17 +24,16 @@ export const AppRouter = () => {
       <Route path="/signup" element={<SignUp />} />
       <Route path="/connect" element={<ConnectWallet />} />
 
-      <Route element={<AppLayout />}>
-
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/projects" element={<Projects />} />
-        <Route path="/all-projects" element={<AllProjects />} />
-        <Route path="/register-project" element={<RegisterProject />} />
-        <Route path="/deployments" element={<Deployments />} />
-        <Route path="/marketplace" element={<MarketPlace />} />
-        <Route path="/pipelines" element={<Pipeline />} />
-        <Route path="/audit-logs" element={<AuditDashboard />} />
-        <Route path="/version-history" element={<VersionHistory />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/all-projects" element={<AllProjects />} />
+          <Route path="/register-project" element={<RegisterProject />} />
+          <Route path="/deployments" element={<Deployments />} />
+          <Route path="/marketplace" element={<MarketPlace />} />
+          <Route path="/pipelines" element={<Pipeline />} />
+          <Route path="/audit-logs" element={<AuditDashboard />} />
+          <Route path="/version-history" element={<VersionHistory />} />
+          <Route path="/blockchain" element={<Blockchain />} />
 
       </Route>
 

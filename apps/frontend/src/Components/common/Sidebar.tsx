@@ -50,6 +50,7 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
         { id: 'market', label: 'Marketplace', icon: 'storefront', path: '/marketplace' },
         { id: 'audit', label: 'Audit Logs', icon: 'security', path: '/audit-logs' },
         { id: 'version-history', label: 'Version History', icon: 'history', path: '/version-history', iconFilled: true },
+        { id: 'blockchain', label: 'Blockchain', icon: 'link', path: '/blockchain' },
         { id: 'settings', label: 'Settings', icon: 'settings', path: '/settings' },
     ];
 

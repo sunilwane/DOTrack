@@ -8,3 +8,4 @@ export * from './auth';
 export * from './wallet';
 export * from './dashboard';
 export * from './marketplace';
+export * from './blockchain';
