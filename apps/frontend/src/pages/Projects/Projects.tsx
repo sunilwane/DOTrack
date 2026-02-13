@@ -130,7 +130,7 @@ const Projects: React.FC = () => {
                 </div>
             )}
 
-            
+
             <div className="mt-12 flex flex-wrap items-center gap-8 px-6 py-4 bg-white dark:bg-[#161616] border border-slate-200 dark:border-slate-800 rounded-2xl">
                 <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-primary/10 text-primary">
