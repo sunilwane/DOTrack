@@ -2,11 +2,14 @@ import * as React from "react";
 import { Button } from "../../Components/common/Button";
 import ProjectCard from "./ProjectCard";
 import { mockProjects } from "../../mock/PagesMockData/projects";
+import { useNavigate } from "react-router-dom";
 
 const Projects: React.FC = () => {
+    const navigate = useNavigate();
+
     return (
         <div className="p-8 max-w-7xl mx-auto mt-8">
-           
+
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h2 className="text-lg font-bold dark:text-white tracking-tight">Active Projects</h2>
@@ -17,6 +20,13 @@ const Projects: React.FC = () => {
                 <div className="flex items-center gap-4">
                     <Button
                         size="sm"
+                        variant="secondary"
+                        onClick={() => navigate("/projects/deploy-request")}
+                    >
+                        <span className="text-sm">Deploy</span>
+                    </Button>
+                    <Button
+                        size="sm"
                         variant="primary"
                         icon={<span className="material-symbols-outlined text-lg">add</span>}
                     >
@@ -25,13 +35,13 @@ const Projects: React.FC = () => {
                 </div>
             </div>
 
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {mockProjects.map((project, index) => (
                     <ProjectCard key={index} {...project} />
                 ))}
 
-                
+
                 <button className="bg-slate-50 dark:bg-slate-900/30 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-5 hover:border-primary/50 hover:bg-primary/5 transition-all flex flex-col items-center justify-center gap-3 text-slate-400 hover:text-primary min-h-[280px]">
                     <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 group-hover:border-primary/50">
                         <span className="material-symbols-outlined">add_circle</span>
@@ -43,7 +53,7 @@ const Projects: React.FC = () => {
                 </button>
             </div>
 
-            
+
             <div className="mt-12 flex flex-wrap items-center gap-8 px-6 py-4 bg-white dark:bg-[#161616] border border-slate-200 dark:border-slate-800 rounded-2xl">
                 <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-primary/10 text-primary">

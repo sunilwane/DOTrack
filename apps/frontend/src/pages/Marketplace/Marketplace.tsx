@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { PublicHeader } from "../../Components/layout/PublicHeader";
 import { Footer } from "../../Components/layout/Footer";
 import Pagination from "../../Components/common/Pagination";
 import { TemplateCardComponent } from "../../Components/common/marketplace/TemplateCard";
@@ -33,27 +32,27 @@ const MarketPlace = () => {
   };
 
   const itemsPerPage = 9;
-  
+
   const filteredTemplates = marketplaceTemplates.filter(template => {
     const searchLower = searchQuery.toLowerCase();
-    const matchesSearch = searchLower === "" || 
+    const matchesSearch = searchLower === "" ||
       template.title.toLowerCase().includes(searchLower) ||
       template.tags.some(tag => tag.toLowerCase().includes(searchLower)) ||
       template.author.address.toLowerCase().includes(searchLower);
-    
+
     return matchesSearch;
   });
-  
+
   const startIndex = (currentPage - 1) * itemsPerPage;
   const displayedTemplates = filteredTemplates.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="bg-background-light dark:bg-background-dark text-white min-h-screen">
-     
+
       <main className="flex flex-1 justify-center py-5 px-2 lg:px-10">
         <div className="layout-content-container flex flex-col max-w-[1400px] flex-1">
           <div className="flex flex-col gap-2 pb-8">
-            <h1 className="text-2xl font-bold mb-1">
+            <h1 className="text-lg font-bold mb-1">
               Decentralized Pipeline Marketplace
             </h1>
             <p className="text-xs text-gray-400">
@@ -61,7 +60,7 @@ const MarketPlace = () => {
             </p>
           </div>
 
-          <div className="pb-6 relative z-[100]">
+          <div className="pb-6 relative z-10">
             <div className="flex flex-col md:flex-row gap-4 items-center">
               <label className="flex flex-col min-w-30 h-10 w-full flex-1">
                 <div className="flex w-full flex-1 items-stretch rounded-xl h-full shadow-lg">
@@ -87,15 +86,14 @@ const MarketPlace = () => {
                       <p className="text-white text-sm font-medium">{category.name}</p>
                       <span className="material-symbols-outlined">keyboard_arrow_down</span>
                     </button>
-                    
+
                     {selectedCategory === category.name && (
                       <div className="absolute top-full mt-2 left-0 right-0 bg-[#1a1f2e] border border-white/10 rounded-xl shadow-xl z-[9999] overflow-hidden">
                         {category.options.map((option, index) => (
                           <button
                             key={option}
-                            className={`w-full text-left px-4 py-3 text-sm text-white hover:bg-white/5 transition-colors ${
-                              index < category.options.length - 1 ? "border-b border-white/5" : ""
-                            }`}
+                            className={`w-full text-left px-4 py-3 text-sm text-white hover:bg-white/5 transition-colors ${index < category.options.length - 1 ? "border-b border-white/5" : ""
+                              }`}
                           >
                             {option}
                           </button>
@@ -112,16 +110,14 @@ const MarketPlace = () => {
             {quickFilters.map((filter) => (
               <button
                 key={filter}
-                className={`flex h-6 items-center justify-center gap-x-2 rounded-full px-4 border transition-colors ${
-                  selectedQuickFilter === filter
+                className={`flex h-6 items-center justify-center gap-x-2 rounded-full px-4 border transition-colors ${selectedQuickFilter === filter
                     ? "bg-primary/20 border-primary/30"
                     : "bg-[#282e39] border-white/5 hover:bg-white/10"
-                }`}
+                  }`}
                 onClick={() => setSelectedQuickFilter(filter)}
               >
-                <p className={`text-xs font-bold uppercase tracking-wider ${
-                  selectedQuickFilter === filter ? "text-primary" : "text-white/70"
-                }`}>
+                <p className={`text-xs font-bold uppercase tracking-wider ${selectedQuickFilter === filter ? "text-primary" : "text-white/70"
+                  }`}>
                   {filter}
                 </p>
               </button>
@@ -138,7 +134,7 @@ const MarketPlace = () => {
             ))}
           </div>
 
-        
+
           <div className="mt-12">
             <Pagination
               totalItems={filteredTemplates.length}

@@ -23,7 +23,7 @@ const AuditDashboard: React.FC = () => {
         <div className="p-2 sm:p-3 lg:p-4 space-y-8 bg-nexus-bg text-white min-h-screen">
             <div className="max-w-[1400px] mx-auto space-y-5">
                 <div>
-                    <h1 className="text-3xl font-bold mb-1">
+                    <h1 className="text-lg font-bold mb-1">
                         Deployment Audit History
                     </h1>
                     <p className="text-xs text-gray-400">
