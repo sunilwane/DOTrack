@@ -72,6 +72,13 @@ const Projects: React.FC = () => {
                 <div className="flex items-center gap-4">
                     <Button
                         size="sm"
+                        variant="secondary"
+                        onClick={() => navigate("/projects/deploy-request")}
+                    >
+                        <span className="text-sm">Deploy</span>
+                    </Button>
+                    <Button
+                        size="sm"
                         variant="primary"
                         icon={<span className="material-symbols-outlined text-lg">add</span>}
                     >
@@ -79,6 +86,7 @@ const Projects: React.FC = () => {
                     </Button>
                 </div>
             </div>
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {isLoading ? (
