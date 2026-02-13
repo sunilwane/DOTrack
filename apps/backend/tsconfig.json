@@ -6,8 +6,9 @@
     "outDir": "dist",
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "typeRoots": ["node_modules/@types", "../node_modules/@types"]
   },
-  "include": ["src/**/*"],   // 👈 include all .ts files from src
-  "exclude": ["dist", "node_modules"]  // 👈 don’t recompile built files
+  "include": ["src/**/*"],
+  "exclude": ["dist", "node_modules"]
 }

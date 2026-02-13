@@ -32,7 +32,7 @@ export const Input: React.FC<InputProps> = ({
                 id={inputId}
                 aria-invalid={error ? true : undefined}
                 aria-describedby={error ? `${inputId}-error` : undefined}
-                className={`w-full h-12 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-lg px-4 text-sm focus:border-primary focus:ring-0 transition-colors placeholder:text-slate-500 text-slate-900 dark:text-white ${error ? 'border-red-500' : ''} ${className}`}
+                className={`w-full h-6 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-lg px-4 text-sm focus:border-primary focus:ring-0 transition-colors placeholder:text-slate-500 text-slate-900 dark:text-white ${error ? 'border-red-500' : ''} ${className}`}
                 {...props}
             />
             {error && (

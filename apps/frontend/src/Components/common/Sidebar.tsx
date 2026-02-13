@@ -35,7 +35,6 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
 
     const handleToggleSidebar = () => {
         setIsCollapsed(!isCollapsed);
-        
         setTimeout(() => {
             if (hamburgerRef.current) {
                 hamburgerRef.current.blur();
@@ -48,9 +47,10 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
         { id: 'projects', label: 'Projects', icon: 'grid_view', path: '/all-projects', iconFilled: true },
         { id: 'register', label: 'Register Project', icon: 'add_circle', path: '/register-project' },
         { id: 'pipelines', label: 'Pipelines', icon: 'account_tree', path: '/pipelines' },
-        { id: 'ipfs', label: 'IPFS Templates', icon: 'description', path: '/ipfs-templates' },
+        { id: 'market', label: 'Marketplace', icon: 'storefront', path: '/marketplace' },
         { id: 'audit', label: 'Audit Logs', icon: 'security', path: '/audit-logs' },
         { id: 'version-history', label: 'Version History', icon: 'history', path: '/version-history', iconFilled: true },
+        { id: 'blockchain', label: 'Blockchain', icon: 'link', path: '/blockchain' },
         { id: 'settings', label: 'Settings', icon: 'settings', path: '/settings' },
     ];
 
@@ -111,15 +111,13 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
 
     return (
         <aside className={`${isCollapsed ? 'w-20' : 'w-64'} h-screen fixed top-0 left-0 flex flex-col justify-between bg-[#111318] border-r border-slate-800 p-4 transition-all duration-300 z-50 overflow-hidden`}>
-            
+
             <div className="flex flex-col gap-10 flex-1 min-h-0">
-                
+
                 <div className={`flex items-center ${isCollapsed ? 'flex-col justify-center gap-4' : 'gap-3'} transition-all duration-300`}>
-                    <button
-                        type="button"
-                        className={`flex items-center gap-3 ${isCollapsed ? 'hidden' : 'flex'} cursor-pointer bg-transparent border-none p-0 text-left flex-1 focus:outline-none`}
-                        onClick={() => navigate("/")}
-                        aria-label="Navigate to home"
+                    <div
+                        className={`flex items-center gap-3 ${isCollapsed ? 'hidden' : 'flex'} bg-transparent border-none p-0 text-left flex-1`}
+                        aria-hidden={true}
                     >
                         <Logo className="size-9 text-primary shrink-0" />
                         <div className="flex flex-col whitespace-nowrap overflow-hidden">
@@ -128,17 +126,12 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                                 Web3 DevOps
                             </p>
                         </div>
-                    </button>
+                    </div>
 
                     {isCollapsed && (
-                        <button
-                            type="button"
-                            className="cursor-pointer bg-transparent border-none p-0 focus:outline-none"
-                            onClick={() => navigate("/")}
-                            aria-label="Navigate to home"
-                        >
+                        <div className="cursor-default bg-transparent border-none p-0 focus:outline-none" aria-hidden={true}>
                             <Logo className="size-9 text-primary shrink-0" />
-                        </button>
+                        </div>
                     )}
 
                     <button
@@ -151,7 +144,6 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                     </button>
                 </div>
 
-                
                 {isCollapsed ? (
                     <nav className="flex-1 overflow-y-auto overflow-x-visible px-1 scrollbar-hide">
                         <div className="flex flex-col gap-1">
@@ -169,9 +161,9 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                 )}
             </div>
 
-            
+
             <div className="flex flex-col gap-4 mt-auto pt-4 border-t border-slate-800/50">
-                
+
                 <div className={`p-3 bg-white/5 rounded-lg border border-white/10 ${isCollapsed ? 'flex justify-center transition-all' : ''}`}>
                     {!isCollapsed && <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-2">Network Active</p>}
                     <div className="flex items-center gap-2">
@@ -180,15 +172,15 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                     </div>
                 </div>
 
-                
+
                 {!isCollapsed ? (
                     <Button
-                        
+
                         className="w-full h-11 "
                         onClick={() => navigate("/connect")}
                         icon={<span className="material-symbols-outlined size-6.5">account_balance_wallet</span>}
                     >
-                       <span className="text-sm"> Wallet Active</span> 
+                        <span className="text-sm"> Wallet Active</span>
                     </Button>
                 ) : (
                     <SimpleTooltip label="Wallet Active" placement="right" className="w-full">
@@ -201,7 +193,6 @@ function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                     </SimpleTooltip>
                 )}
 
-               
                 <div className={`flex flex-col gap-1 border-t border-white/5 pt-2 ${isCollapsed ? 'items-center' : ''}`}>
                     <SidebarLink icon="menu_book" label="Docs" collapsed={isCollapsed} onClick={() => window.open('https://docs.example.com', '_blank')} />
                     <SidebarLink icon="support" label="Support" collapsed={isCollapsed} onClick={() => window.open('https://support.example.com', '_blank')} />

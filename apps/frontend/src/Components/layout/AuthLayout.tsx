@@ -18,7 +18,6 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
     description,
     backgroundVariant = "node",
     maxWidth = "max-w-[440px]",
-    // showLogo = true (unused)
 }) => {
     const navigate = useNavigate();
 
