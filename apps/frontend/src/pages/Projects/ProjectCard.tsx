@@ -101,7 +101,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
     const config = statusConfig[status];
 
     return (
-        <div className={`bg-white dark:bg-[#161616] border border-slate-200 dark:border-slate-800 rounded-xl p-5 hover:border-primary/50 transition-all group relative overflow-hidden`}>
+        <div className={`bg-white dark:bg-[#161616] border border-primary/50 rounded-xl p-5 transition-all group relative overflow-hidden`}>
             <div className="absolute top-0 right-0 p-3">
                 <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full ${config.bg} ${config.text} text-[10px] font-bold uppercase tracking-wider border ${config.border}`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`}></span>
