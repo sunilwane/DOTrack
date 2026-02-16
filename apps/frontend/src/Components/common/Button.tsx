@@ -27,7 +27,7 @@ export const Button: React.FC<ButtonProps> = ({
     };
 
     const sizes = {
-        xs: "h-6 px-3 text-[6px] font-semibold rounded-md shadow-none",
+        xs: "h-8 px-3 text-[6px] font-semibold rounded-md shadow-none",
         sm: "h-9 px-3 text-xs",
         md: "h-10 px-5 text-sm",
         lg: "h-12 px-6 text-base",

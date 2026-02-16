@@ -13,6 +13,13 @@ export interface FileUploadState {
 }
 
 const Pipeline: React.FC = () => {
+    const [isSimulatingLoad, setIsSimulatingLoad] = useState(true);
+
+    React.useEffect(() => {
+        const timer = setTimeout(() => setIsSimulatingLoad(false), 2000);
+        return () => clearTimeout(timer);
+    }, []);
+
     const [uploadState, setUploadState] = useState<FileUploadState>({
         file: null,
         content: '',
@@ -27,7 +34,7 @@ const Pipeline: React.FC = () => {
         const fileName = file.name.toLowerCase();
         const validExtensions = ['.yml', '.yaml', '.json'];
         const extension = fileName.substring(fileName.lastIndexOf('.'));
-        
+
         if (!validExtensions.includes(extension)) {
             return {
                 valid: false,
@@ -51,7 +58,7 @@ const Pipeline: React.FC = () => {
 
     const handleFile = useCallback(async (file: File) => {
         const validation = validateFile(file);
-        
+
         if (!validation.valid) {
             setUploadState(prev => ({ ...prev, error: validation.error }));
             setShowErrorModal(true);
@@ -67,9 +74,9 @@ const Pipeline: React.FC = () => {
                 error: null,
             });
         } catch {
-            setUploadState(prev => ({ 
-                ...prev, 
-                error: 'Failed to read file content. Please try again.' 
+            setUploadState(prev => ({
+                ...prev,
+                error: 'Failed to read file content. Please try again.'
             }));
             setShowErrorModal(true);
         }
@@ -123,11 +130,12 @@ const Pipeline: React.FC = () => {
 
     return (
         <div className="flex-1 flex flex-col bg-background-light dark:bg-background-dark">
-            <PipelineHeader />
+            <PipelineHeader isLoading={isSimulatingLoad} />
 
             <div className="px-8 py-6 max-w-6xl mx-auto w-full">
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                     <UploadEditor
+                        isLoading={isSimulatingLoad}
                         uploadState={uploadState}
                         fileInputRef={fileInputRef}
                         isDragging={isDragging}
@@ -139,11 +147,11 @@ const Pipeline: React.FC = () => {
                         onClearFile={handleClearFile}
                     />
 
-                    <SidebarPreview uploadState={uploadState} copyToClipboard={copyToClipboard} />
+                    <SidebarPreview isLoading={isSimulatingLoad} uploadState={uploadState} copyToClipboard={copyToClipboard} />
                 </div>
             </div>
 
-            
+
             {showErrorModal && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
                     <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 max-w-md mx-4 shadow-2xl border border-slate-200 dark:border-slate-800">
