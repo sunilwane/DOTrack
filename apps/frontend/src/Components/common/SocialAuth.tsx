@@ -2,8 +2,7 @@ import * as React from "react";
 import { Button } from "../common/Button";
 import { GitHubIcon, GoogleIcon } from "../icons";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+const API_BASE_URL = "https://backend-production-0dbd.up.railway.app";
 
 export const SocialAuth: React.FC = () => {
   const returnTo =
