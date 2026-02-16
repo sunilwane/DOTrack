@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Button } from "../../Components/common/Button";
 import ProjectCard from "./ProjectCard";
 import Pagination from "../../Components/common/Pagination";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
@@ -22,7 +23,8 @@ const Projects: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
-
+    
+    const navigate = useNavigate();
     useEffect(() => {
         const fetchRepos = async () => {
             try {

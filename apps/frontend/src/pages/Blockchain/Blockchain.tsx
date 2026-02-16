@@ -2,7 +2,6 @@
 
 import { useState, type ChangeEvent } from 'react';
 import Sidebar from '../../Components/common/Sidebar';
-import Topbar from '../../Components/common/Topbar';
 import { BlockchainNetworkCard } from '../../Components/common/Blockchain/BlockchainNetworkCard';
 import { CICDProviderCard } from '../../Components/common/Blockchain/CICDProviderCard';
 import { WalletsTable } from '../../Components/common/Blockchain/WalletsTable';
@@ -15,25 +14,25 @@ export default function BlockchainPage() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [discordWebhook, setDiscordWebhook] = useState("");
 
-  const handleSwitchNetwork = (networkId: string) => {
+  const handleSwitchNetwork = () => {
   };
 
-  const handleNetworkSettings = (networkId: string) => {
+  const handleNetworkSettings = () => {
   };
 
-  const handleConfigureProvider = (providerId: string) => {
+  const handleConfigureProvider = () => {
   };
 
-  const handleDisconnectProvider = (providerId: string) => {
+  const handleDisconnectProvider = () => {
   };
 
-  const handleConnectProvider = (providerId: string) => {
+  const handleConnectProvider = () => {
   };
 
-  const handleDeleteWallet = (walletId: string) => {
+  const handleDeleteWallet = () => {
   };
 
-  const handleSyncWallet = (walletId: string) => {
+  const handleSyncWallet = () => {
   };
 
   return (
