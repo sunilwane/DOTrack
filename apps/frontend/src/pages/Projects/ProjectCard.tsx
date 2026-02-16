@@ -22,7 +22,7 @@ interface ProjectCardProps extends Partial<ProjectCardData> {
     repoId?: number | string;
 }
 
-const API_BASE_URL = 'https://backend-production-0dbd.up.railway.app';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
 const ProjectCard: React.FC<ProjectCardProps> = ({
     name = 'Unknown',
