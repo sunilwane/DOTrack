@@ -26,7 +26,8 @@ const Projects: React.FC = () => {
     const [isSimulatingLoad, setIsSimulatingLoad] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
-
+    
+    const navigate = useNavigate();
     useEffect(() => {
         const timer = setTimeout(() => setIsSimulatingLoad(false), 2000);
         return () => clearTimeout(timer);
