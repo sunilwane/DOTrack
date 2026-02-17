@@ -66,8 +66,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                     const data = await res.json();
                     setCollaborators(Array.isArray(data) ? data : []);
                 }
-            } catch (e) {
-                console.error('Error fetching collaborators:', e);
             } finally {
                 setIsLoadingCollabs(false);
             }

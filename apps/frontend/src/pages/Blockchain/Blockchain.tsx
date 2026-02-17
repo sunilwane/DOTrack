@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ChangeEvent } from 'react';
+import { useState, useEffect, type ChangeEvent } from 'react';
 import Sidebar from '../../Components/common/Sidebar';
 import { BlockchainNetworkCard } from '../../Components/common/Blockchain/BlockchainNetworkCard';
 import { CICDProviderCard } from '../../Components/common/Blockchain/CICDProviderCard';
@@ -9,10 +9,19 @@ import { Button } from '../../Components/common/Button';
 import { Input } from '../../Components/common/Input';
 import { Divider } from '../../Components/common/Divider';
 import { blockchainNetworks, cicdProviders, connectedWallets } from '../../mock/PagesMockData/BlockchainData';
+import { Skeleton } from '../../Components/Skeleton';
 
 export default function BlockchainPage() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [discordWebhook, setDiscordWebhook] = useState("");
+  const [isSimulatingLoad, setIsSimulatingLoad] = useState(true);
+  const [awsAccessKey, setAwsAccessKey] = useState("AKIA****************");
+  const [awsSecretKey, setAwsSecretKey] = useState("********************************");
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsSimulatingLoad(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleSwitchNetwork = () => {
   };
@@ -44,22 +53,29 @@ export default function BlockchainPage() {
         <main className="p-6">
           <div className="max-w-6xl mx-auto space-y-12">
             <div>
-              <h1 className="text-lg font-bold text-slate-900 dark:text-white">Global Platform Settings</h1>
-              <p className="text-slate-500 dark:text-slate-400 mt-2">
-                Manage your blockchain networks, provider integrations, and security credentials.
-              </p>
+              <Skeleton isLoaded={!isSimulatingLoad} width="240px" height="28px">
+                <h1 className="text-lg font-bold text-slate-900 dark:text-white">Global Platform Settings</h1>
+              </Skeleton>
+              <Skeleton isLoaded={!isSimulatingLoad} width="100%" height="20px" className="mt-2 max-w-2xl">
+                <p className="text-slate-500 dark:text-slate-400">
+                  Manage your blockchain networks, provider integrations, and security credentials.
+                </p>
+              </Skeleton>
             </div>
 
             <section className="space-y-4">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-xl text-primary">token</span>
-                <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Blockchain Network</h2>
+                <Skeleton isLoaded={!isSimulatingLoad} width="160px" height="20px">
+                  <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Blockchain Network</h2>
+                </Skeleton>
               </div>
               <div className="grid md:grid-cols-2 gap-6">
                 {blockchainNetworks.map((network) => (
                   <BlockchainNetworkCard
                     key={network.id}
                     network={network}
+                    isLoading={isSimulatingLoad}
                     onSwitchNetwork={handleSwitchNetwork}
                     onSettings={handleNetworkSettings}
                   />
@@ -70,13 +86,16 @@ export default function BlockchainPage() {
             <section className="space-y-4">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-xl text-primary">integration_instructions</span>
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">CI/CD Providers</h2>
+                <Skeleton isLoaded={!isSimulatingLoad} width="160px" height="20px">
+                  <h2 className="text-xl font-semibold text-slate-900 dark:text-white">CI/CD Providers</h2>
+                </Skeleton>
               </div>
               <div className="space-y-4">
                 {cicdProviders.map((provider) => (
                   <CICDProviderCard
                     key={provider.id}
                     provider={provider}
+                    isLoading={isSimulatingLoad}
                     onConfigure={handleConfigureProvider}
                     onDisconnect={handleDisconnectProvider}
                     onConnect={handleConnectProvider}
@@ -88,35 +107,47 @@ export default function BlockchainPage() {
             <section className="space-y-4">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-xl text-primary">key</span>
-                <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Cloud Credentials</h2>
+                <Skeleton isLoaded={!isSimulatingLoad} width="160px" height="20px">
+                  <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Cloud Credentials</h2>
+                </Skeleton>
               </div>
               <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
                 <div className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-6">
-                    <Input
-                      type="password"
-                      label="AWS Access Key ID"
-                      value="AKIA****************"
-                      readOnly={true}
-                    />
-                    <Input
-                      type="password"
-                      label="AWS Secret Key"
-                      value="********************************"
-                      readOnly={true}
-                    />
+                    <Skeleton isLoaded={!isSimulatingLoad} width="100%" height="56px" className="rounded-lg">
+                      <Input
+                        type="password"
+                        label="AWS Access Key ID"
+                        value={awsAccessKey}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => setAwsAccessKey(e.target.value)}
+                      />
+                    </Skeleton>
+                    <Skeleton isLoaded={!isSimulatingLoad} width="100%" height="56px" className="rounded-lg">
+                      <Input
+                        type="password"
+                        label="AWS Secret Key"
+                        value={awsSecretKey}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => setAwsSecretKey(e.target.value)}
+                      />
+                    </Skeleton>
                   </div>
 
                   <Divider />
 
                   <div className="flex justify-between items-center">
-                    <p className="text-sm mt-1 text-slate-500 dark:text-slate-400 italic">
-                      Secrets are encrypted at rest with AES-256
-                    </p>
+                    <Skeleton isLoaded={!isSimulatingLoad} width="240px" height="16px">
+                      <p className="text-sm mt-2 text-slate-500 dark:text-slate-400 italic">
+                        Secrets are encrypted at rest with AES-256
+                      </p>
+                    </Skeleton>
 
-                    <div className="flex gap-3">
-                      <Button size="xs" variant="primary">Edit Credentials</Button>
-                      <Button size="xs" variant="outline">Test Connection</Button>
+                    <div className="flex gap-3 mt-3">
+                      <Skeleton isLoaded={!isSimulatingLoad} width="120px" height="32px" className="rounded-lg">
+                        <Button size="xs" variant="primary">Edit Credentials</Button>
+                      </Skeleton>
+                      <Skeleton isLoaded={!isSimulatingLoad} width="120px" height="32px" className="rounded-lg">
+                        <Button size="xs" variant="outline">Test Connection</Button>
+                      </Skeleton>
                     </div>
                   </div>
                 </div>
@@ -126,31 +157,41 @@ export default function BlockchainPage() {
             <section className="space-y-4">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-xl text-primary">notifications</span>
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Notifications</h2>
+                <Skeleton isLoaded={!isSimulatingLoad} width="140px" height="20px">
+                  <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Notifications</h2>
+                </Skeleton>
               </div>
               <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
-                    <p className="font-semibold text-slate-900 dark:text-white">Discord Webhook</p>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
-                      Receive build status in your Discord channel.
-                    </p>
+                    <Skeleton isLoaded={!isSimulatingLoad} width="140px" height="20px">
+                      <p className="font-semibold text-slate-900 dark:text-white">Discord Webhook</p>
+                    </Skeleton>
+                    <Skeleton isLoaded={!isSimulatingLoad} width="220px" height="16px" className="mt-1">
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Receive build status in your Discord channel.
+                      </p>
+                    </Skeleton>
                   </div>
 
                   <div className="flex gap-2 w-full md:w-auto">
-                    <Input
-                      placeholder="https://discord.com/api/webhooks/..."
-                      value={discordWebhook}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) => setDiscordWebhook(e.target.value)}
-                      className="flex-1"
-                    />
-                    <Button
-                      size="xs"
-                      variant="primary"
-                      icon={<span className="material-symbols-outlined">send</span>}
-                    >
-                      Send
-                    </Button>
+                    <Skeleton isLoaded={!isSimulatingLoad} width="300px" height="40px" className="rounded-lg flex-1">
+                      <Input
+                        placeholder="https://discord.com/api/webhooks/..."
+                        value={discordWebhook}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => setDiscordWebhook(e.target.value)}
+                        className="flex-1"
+                      />
+                    </Skeleton>
+                    <Skeleton isLoaded={!isSimulatingLoad} width="80px" height="40px" className="rounded-lg">
+                      <Button
+                        size="xs"
+                        variant="primary"
+                        icon={<span className="material-symbols-outlined">send</span>}
+                      >
+                        Send
+                      </Button>
+                    </Skeleton>
                   </div>
                 </div>
               </div>
@@ -160,19 +201,24 @@ export default function BlockchainPage() {
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-xl text-primary">account_balance_wallet</span>
-                  <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Connected Wallets</h2>
+                  <Skeleton isLoaded={!isSimulatingLoad} width="180px" height="24px">
+                    <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Connected Wallets</h2>
+                  </Skeleton>
                 </div>
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  icon={<span className="material-symbols-outlined">add</span>}
-                >
-                  Add New Wallet
-                </Button>
+                <Skeleton isLoaded={!isSimulatingLoad} width="140px" height="32px" className="rounded-lg">
+                  <Button
+                    size="xs"
+                    variant="ghost"
+                    icon={<span className="material-symbols-outlined">add</span>}
+                  >
+                    Add New Wallet
+                  </Button>
+                </Skeleton>
               </div>
 
               <WalletsTable
                 wallets={connectedWallets}
+                isLoading={isSimulatingLoad}
                 onDelete={handleDeleteWallet}
                 onSync={handleSyncWallet}
               />

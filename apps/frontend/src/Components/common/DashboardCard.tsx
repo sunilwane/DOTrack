@@ -3,8 +3,8 @@ import * as React from "react";
 interface CardProps {
     children: React.ReactNode;
     className?: string;
-    title?: string;
-    icon?: string;
+    title?: React.ReactNode;
+    icon?: React.ReactNode;
     extra?: React.ReactNode;
     bodyClassName?: string;
 }
@@ -22,7 +22,11 @@ export const DashboardCard: React.FC<CardProps> = ({
             {(title || icon) && (
                 <div className="flex items-center justify-between">
                     <h3 className="text-sm font-bold flex items-center gap-2 text-slate-900 dark:text-white uppercase tracking-wider">
-                        {icon && <span className="material-symbols-outlined text-primary text-xl">{icon}</span>}
+                        {icon && (
+                            typeof icon === 'string' ? (
+                                <span className="material-symbols-outlined text-primary text-xl">{icon}</span>
+                            ) : icon
+                        )}
                         {title}
                     </h3>
                     {extra && <div className="text-xs text-slate-500 font-medium">{extra}</div>}
