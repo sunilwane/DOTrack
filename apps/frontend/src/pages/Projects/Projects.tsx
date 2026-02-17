@@ -20,13 +20,12 @@ interface GithubRepo {
 const ITEMS_PER_PAGE = 8;
 
 const Projects: React.FC = () => {
-    const navigate = useNavigate();
     const [repos, setRepos] = useState<GithubRepo[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSimulatingLoad, setIsSimulatingLoad] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
-    
+
     const navigate = useNavigate();
     useEffect(() => {
         const timer = setTimeout(() => setIsSimulatingLoad(false), 2000);
