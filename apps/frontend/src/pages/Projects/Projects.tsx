@@ -121,22 +121,10 @@ const Projects: React.FC = () => {
                         />
                     ))
                 )}
-
-                {!showSkeletons && repos.length > 0 && (
-                    <button className="bg-slate-50 dark:bg-slate-900/30 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-5 hover:border-primary/50 hover:bg-primary/5 transition-all flex flex-col items-center justify-center gap-3 text-slate-400 hover:text-primary min-h-[280px]">
-                        <div className="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 group-hover:border-primary/50">
-                            <span className="material-symbols-outlined">add_circle</span>
-                        </div>
-                        <div className="text-center">
-                            <p className="font-bold text-sm">Create New Project</p>
-                            <p className="text-[10px] opacity-70">Connect a new repository</p>
-                        </div>
-                    </button>
-                )}
             </div>
 
             {!showSkeletons && repos.length > 0 && (
-                <div className="sticky bottom-0 bg-[#0a0f1e]/95 backdrop-blur-sm border-t border-slate-800 p-4 mt-8 -mx-8">
+                <div className="sticky bottom-0 z-50 bg-[#0a0f1e]/95 backdrop-blur-sm border-t border-slate-800 p-4 mt-8 -mx-8">
                     <Skeleton isLoaded={!showSkeletons} width="100%" height="40px">
                         <Pagination
                             totalItems={repos.length}
