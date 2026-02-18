@@ -23,33 +23,39 @@ export default function BlockchainPage() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleSwitchNetwork = () => {
+  const handleSwitchNetwork = (networkId: string) => {
+    void networkId;
   };
 
-  const handleNetworkSettings = () => {
+  const handleNetworkSettings = (networkId: string) => {
+    void networkId;
   };
 
-  const handleConfigureProvider = () => {
+  const handleConfigureProvider = (providerId: string) => {
+    void providerId;
   };
 
-  const handleDisconnectProvider = () => {
+  const handleDisconnectProvider = (providerId: string) => {
+    void providerId;
   };
 
-  const handleConnectProvider = () => {
+  const handleConnectProvider = (providerId: string) => {
+    void providerId;
   };
 
-  const handleDeleteWallet = () => {
+  const handleDeleteWallet = (walletId: string) => {
+    void walletId;
   };
 
-  const handleSyncWallet = () => {
+  const handleSyncWallet = (walletId: string) => {
+    void walletId;
   };
 
   return (
     <div className="min-h-screen bg-background-light dark:bg-background-dark flex">
       <Sidebar isCollapsed={isSidebarCollapsed} setIsCollapsed={setIsSidebarCollapsed} />
 
-      <div className={`flex-1 transition-all duration-300`}>
-
+      <div className="flex-1 transition-all duration-300">
         <main className="p-6">
           <div className="max-w-6xl mx-auto space-y-12">
             <div>

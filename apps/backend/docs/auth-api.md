@@ -21,7 +21,7 @@ Registers a new user.
 ### `POST /api/auth/signin`
 Authenticates an existing user.
 - **Body:** `{ "email": "user@example.com", "password": "T0pS3cret!" }`
-- **Response:** `200 OK` with `{ "token": "<jwt>" }`. Token expires after 1 hour.
+- **Response:** `200 OK` with `{ "accessToken": "<jwt>" }`. Token expires after 1 hour.
 - **Errors:** `401` when credentials are invalid.
 
 ### `POST /api/auth/signout`
@@ -101,5 +101,5 @@ Troubleshooting:
 - To simulate an invalid refresh token, clear the cookie and call `POST /api/auth/refresh` to verify the `401` behavior.
 
 ## Next steps
-- Replace `requireAuth` placeholder uses with actual route protection (e.g., add `GET /api/auth/me`).
-- Implement email confirmation or refresh tokens if needed for your security posture.
+- Add unit/integration tests for auth and OAuth flows.
+- Add structured logging and rate limiting for third-party API calls.

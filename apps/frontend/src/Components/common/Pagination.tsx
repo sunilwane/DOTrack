@@ -22,7 +22,7 @@ const Pagination = ({
     isLoading,
 }: PaginationProps) => {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
-    const start = (currentPage - 1) * itemsPerPage + 1;
+    const start = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
     const end = Math.min(currentPage * itemsPerPage, totalItems);
 
     const getPageNumbers = () => {
@@ -35,25 +35,26 @@ const Pagination = ({
             }
         } else {
             pages.push(1);
-            if (currentPage > 3) pages.push('...');
+            if (currentPage > 3) pages.push("...");
 
-            const start = Math.max(2, currentPage - 1);
-            const end = Math.min(totalPages - 1, currentPage + 1);
+            const startPage = Math.max(2, currentPage - 1);
+            const endPage = Math.min(totalPages - 1, currentPage + 1);
 
-            for (let i = start; i <= end; i++) {
+            for (let i = startPage; i <= endPage; i++) {
                 pages.push(i);
             }
 
-            if (currentPage < totalPages - 2) pages.push('...');
+            if (currentPage < totalPages - 2) pages.push("...");
             pages.push(totalPages);
         }
+
         return pages;
     };
 
     const handlePageChange = (page: number) => {
         if (page >= 1 && page <= totalPages && onPageChange) {
             onPageChange(page);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: "smooth" });
         }
     };
 
@@ -72,27 +73,30 @@ const Pagination = ({
                         <Skeleton isLoaded={!isLoading} width="60px" height="12px">
                             <span className="text-xs text-slate-400">Per page:</span>
                         </Skeleton>
-                        <Skeleton isLoaded={!isLoading} width="80px" height="32px">
-                            <Select
-                                size="sm"
-                                selectedKeys={[itemsPerPage.toString()]}
-                                onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
-                                className="w-20"
-                                classNames={{
-                                    trigger: "bg-slate-800 border-slate-700 data-[hover=true]:bg-slate-700 h-8 min-h-8",
-                                    value: "text-xs text-white font-semibold",
-                                    popoverContent: "bg-slate-800 border border-slate-700"
-                                }}
-                            >
-                                {ITEMS_PER_PAGE_OPTIONS.map((option) => (
-                                    <SelectItem
-                                        key={option.toString()}
-                                        className="text-white data-[hover=true]:bg-slate-700"
-                                    >
-                                        {option}
-                                    </SelectItem>
-                                ))}
-                            </Select>
+                        <Skeleton isLoaded={!isLoading} width="92px" height="32px">
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs font-semibold text-white w-6 text-right">{itemsPerPage}</span>
+                                <Select
+                                    size="sm"
+                                    selectedKeys={[itemsPerPage.toString()]}
+                                    onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
+                                    className="w-10"
+                                    classNames={{
+                                        trigger: "flex items-center justify-center bg-slate-800 border-slate-700 data-[hover=true]:bg-slate-700 h-8 min-h-8 px-2",
+                                        value: "sr-only",
+                                        popoverContent: "bg-slate-800 border border-slate-700 min-w-[4.5rem]",
+                                    }}
+                                >
+                                    {ITEMS_PER_PAGE_OPTIONS.map((option) => (
+                                        <SelectItem
+                                            key={option.toString()}
+                                            className="text-white data-[hover=true]:bg-slate-700"
+                                        >
+                                            {option}
+                                        </SelectItem>
+                                    ))}
+                                </Select>
+                            </div>
                         </Skeleton>
                     </div>
                 )}
@@ -100,7 +104,6 @@ const Pagination = ({
 
             <div className="flex gap-1.5 items-center">
                 <Skeleton isLoaded={!isLoading} width="32px" height="32px" className="rounded">
-                    {/* Previous Button */}
                     <Button
                         size="sm"
                         variant="bordered"
@@ -108,13 +111,12 @@ const Pagination = ({
                         onClick={() => handlePageChange(currentPage - 1)}
                         isDisabled={currentPage === 1}
                         className="pagination-icon-btn !text-white border-slate-700 hover:bg-slate-800 hover:border-primary disabled:opacity-30 disabled:cursor-not-allowed h-8 min-w-8"
-                        style={{ color: 'white' }}
+                        style={{ color: "white" }}
                     >
                         <ChevronLeftIcon size={20} />
                     </Button>
                 </Skeleton>
 
-                {/* Page Numbers */}
                 <div className="flex gap-1.5">
                     {isLoading ? (
                         Array.from({ length: 3 }).map((_, i) => (
@@ -123,17 +125,18 @@ const Pagination = ({
                     ) : (
                         getPageNumbers().map((page, index) => (
                             <div key={index}>
-                                {page === '...' ? (
-                                    <span className="flex items-center justify-center h-8 w-8 text-slate-500">•••</span>
+                                {page === "..." ? (
+                                    <span className="flex items-center justify-center h-8 w-8 text-slate-500">...</span>
                                 ) : (
                                     <Button
                                         size="sm"
                                         variant={currentPage === page ? "solid" : "bordered"}
                                         onClick={() => handlePageChange(page as number)}
-                                        className={`h-8 min-w-8 px-2 text-xs font-semibold ${currentPage === page
-                                                ? 'bg-primary border-primary text-white'
-                                                : 'border-slate-700 text-white hover:bg-slate-800 hover:border-primary'
-                                            }`}
+                                        className={`h-8 min-w-8 px-2 text-xs font-semibold ${
+                                            currentPage === page
+                                                ? "bg-primary border-primary text-white"
+                                                : "border-slate-700 text-white hover:bg-slate-800 hover:border-primary"
+                                        }`}
                                     >
                                         {page}
                                     </Button>
@@ -144,15 +147,14 @@ const Pagination = ({
                 </div>
 
                 <Skeleton isLoaded={!isLoading} width="32px" height="32px" className="rounded">
-                    {/* Next Button */}
                     <Button
                         size="sm"
                         variant="bordered"
                         isIconOnly
                         onClick={() => handlePageChange(currentPage + 1)}
-                        isDisabled={currentPage === totalPages}
+                        isDisabled={currentPage === totalPages || totalPages === 0}
                         className="pagination-icon-btn !text-white border-slate-700 hover:bg-slate-800 hover:border-primary disabled:opacity-30 disabled:cursor-not-allowed h-8 min-w-8"
-                        style={{ color: 'white' }}
+                        style={{ color: "white" }}
                     >
                         <ChevronRightIcon size={20} />
                     </Button>
