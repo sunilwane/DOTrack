@@ -6,12 +6,11 @@ import { Input } from "../../Components/common/Input";
 import { SocialAuth } from "../../Components/common/SocialAuth";
 import { Divider } from "../../Components/common/Divider";
 import { useAuth } from "../../contexts/AuthContext";
-import { authService } from '../../services/authService';
 import { SignUpFields } from "../../mock/PagesMockData/AuthData";
 
 const SignUp: React.FC = () => {
     const navigate = useNavigate();
-    const { isAuthenticated, isLoading } = useAuth();
+    const { signup, isAuthenticated, isLoading } = useAuth();
     const [error, setError] = React.useState<string | null>(null);
     const [loading, setLoading] = React.useState(false);
 
@@ -43,10 +42,10 @@ const SignUp: React.FC = () => {
         const password = formData.get('password') as string;
 
         try {
-            await authService.signup({ name, email, password });
+            await signup({ name, email, password });
             navigate('/login');
-        } catch (err: any) {
-            setError(err.message || 'Sign up failed. Please try again.');
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Sign up failed. Please try again.');
         } finally {
             setLoading(false);
         }

@@ -1,4 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+import { apiRequest } from './apiClient';
+import { apiPaths } from './apiPaths';
+import { tokenStorage } from './tokenStorage';
 
 export interface SignUpData {
   name: string;
@@ -25,111 +27,67 @@ export interface UserResponse {
 }
 
 class AuthService {
-  private getAuthHeaders(): HeadersInit {
-    const token = localStorage.getItem('accessToken');
-    return {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-    };
-  }
-
   async signup(data: SignUpData): Promise<{ id: string; email: string; name: string }> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
+    return apiRequest<{ id: string; email: string; name: string }>(apiPaths.auth.signup, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: data,
     });
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Signup failed' }));
-      throw new Error(error.error || 'Signup failed');
-    }
-
-    return response.json();
   }
 
   async signin(data: SignInData): Promise<AuthResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/signin`, {
+    const result = await apiRequest<AuthResponse>(apiPaths.auth.signin, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(data),
+      body: data,
     });
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Invalid credentials' }));
-      throw new Error(error.error || 'Invalid credentials');
-    }
-
-    const result = await response.json();
-    
     if (result.accessToken) {
-      localStorage.setItem('accessToken', result.accessToken);
+      tokenStorage.set(result.accessToken);
     }
 
     return result;
   }
 
   async signout(): Promise<void> {
-    const token = localStorage.getItem('accessToken');
-    
+    const token = tokenStorage.get();
+
     if (!token) {
-      localStorage.removeItem('accessToken');
+      tokenStorage.clear();
       return;
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/signout`, {
+      await apiRequest<{ ok: boolean }>(apiPaths.auth.signout, {
         method: 'POST',
-        headers: this.getAuthHeaders(),
-        credentials: 'include',
+        auth: true,
       });
-
-      if (!response.ok) {
-        console.warn('Signout request failed, but clearing local data');
-      }
     } catch (error) {
-      console.error('Signout error:', error);
+      console.warn('Signout request failed, but clearing local data', error);
     } finally {
-      localStorage.removeItem('accessToken');
+      tokenStorage.clear();
     }
   }
 
   async refresh(): Promise<AuthResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
+    const result = await apiRequest<AuthResponse>(apiPaths.auth.refresh, {
       method: 'POST',
-      credentials: 'include',
     });
 
-    if (!response.ok) {
-      throw new Error('Refresh token expired');
-    }
-
-    const result = await response.json();
-    
     if (result.accessToken) {
-      localStorage.setItem('accessToken', result.accessToken);
+      tokenStorage.set(result.accessToken);
     }
 
     return result;
   }
 
   async getMe(): Promise<UserResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+    return apiRequest<UserResponse>(apiPaths.auth.me, {
       method: 'GET',
-      headers: this.getAuthHeaders(),
-      credentials: 'include',
+      auth: true,
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch user data');  
-    }
-
-    return response.json();
   }
 
   getAccessToken(): string | null {
-    return localStorage.getItem('accessToken');
+    return tokenStorage.get();
   }
 
   isAuthenticated(): boolean {

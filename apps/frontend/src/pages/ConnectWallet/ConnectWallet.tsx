@@ -4,7 +4,6 @@ import { WalletOptionCard } from "./WalletOptionCard";
 import { WalletOptions } from "../../mock/PagesMockData/WalletData";
 
 const ConnectWallet: React.FC = () => {
-    
     const isConnected = false; 
     const isPolygonMainnet = false; 
 
