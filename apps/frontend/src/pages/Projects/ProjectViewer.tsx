@@ -3,6 +3,7 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { RepoStateProvider, useRepoState } from '../../contexts/RepoState';
 import { SimpleTooltip } from '../../Components/common/SimpleTooltip';
 import { authService } from '../../services/authService';
+import { buildApiUrl } from '../../services/apiClient';
 
 interface Highlighter {
   codeToHtml(code: string, options: { lang?: string }): string;
@@ -28,6 +29,11 @@ const buildGithubRequestOptions = (): RequestInit => {
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   };
 };
+
+const buildGithubApiUrl = (owner: string, repo: string, suffix: string): string =>
+  buildApiUrl(
+    `/api/github/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}${suffix}`
+  );
 
 const FileExplorer = ({
   owner,
@@ -56,7 +62,11 @@ const FileExplorer = ({
     setError(null);
     try {
       const res = await fetch(
-        `/api/github/${owner}/${repo}/tree?ref=${encodeURIComponent(branch)}&path=${encodeURIComponent(dirPath)}`,
+        buildGithubApiUrl(
+          owner,
+          repo,
+          `/tree?ref=${encodeURIComponent(branch)}&path=${encodeURIComponent(dirPath)}`
+        ),
         buildGithubRequestOptions()
       );
       if (res.status === 403) {
@@ -331,7 +341,11 @@ const CodeViewer = () => {
     setIsLarge(false);
     try {
       const res = await fetch(
-        `/api/github/${state.owner}/${state.repo}/file?ref=${encodeURIComponent(state.branch)}&path=${encodeURIComponent(state.path)}`,
+        buildGithubApiUrl(
+          state.owner,
+          state.repo,
+          `/file?ref=${encodeURIComponent(state.branch)}&path=${encodeURIComponent(state.path)}`
+        ),
         buildGithubRequestOptions()
       );
       if (res.status === 403) {
@@ -466,13 +480,14 @@ const BranchSelector = ({ owner, repo, currentBranch }: { owner: string; repo: s
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const branchListScrollRef = useRef<HTMLDivElement | null>(null);
+  const currentBranchLabel = currentBranch || 'default';
 
   useEffect(() => {
     const loadBranches = async () => {
       setLoading(true);
       try {
         const res = await fetch(
-          `/api/github/${owner}/${repo}/branches`,
+          buildGithubApiUrl(owner, repo, '/branches'),
           buildGithubRequestOptions()
         );
         if (res.ok) {
@@ -546,11 +561,11 @@ const BranchSelector = ({ owner, repo, currentBranch }: { owner: string; repo: s
     el.scrollTop = nextTop;
   };
 
-  const visibleBranches = branches.length > 0 ? branches : [{ name: currentBranch }];
+  const visibleBranches = branches.length > 0 ? branches : [{ name: currentBranchLabel }];
 
   return (
     <div ref={dropdownRef} className="relative">
-      <SimpleTooltip label={currentBranch} placement="bottom" className="w-[220px] sm:w-[260px] max-w-[260px]">
+      <SimpleTooltip label={currentBranchLabel} placement="bottom" className="w-[220px] sm:w-[260px] max-w-[260px]">
         <button
           type="button"
           onClick={() => setIsOpen((prev) => !prev)}
@@ -561,7 +576,7 @@ const BranchSelector = ({ owner, repo, currentBranch }: { owner: string; repo: s
         >
             <span className="flex items-center gap-2 min-w-0">
             <span className="material-symbols-outlined text-base text-primary">fork_right</span>
-            <span className="text-[11px] font-medium block truncate w-[130px] sm:w-[160px]">{currentBranch}</span>
+            <span className="text-[11px] font-medium block truncate w-[130px] sm:w-[160px]">{currentBranchLabel}</span>
           </span>
           <span className="material-symbols-outlined text-base text-slate-300">
             {isOpen ? 'expand_less' : 'expand_more'}
@@ -607,7 +622,7 @@ const Inner = () => {
   const [search] = useSearchParams();
   const owner = params.owner || '';
   const repo = params.repo || '';
-  const ref = search.get('ref') || 'main';
+  const ref = search.get('ref') || '';
   const path = search.get('path') || '';
   const { state, dispatch } = useRepoState();
   const prevBranch = state.branch;

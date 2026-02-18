@@ -40,12 +40,13 @@ export const getBranches = async (req: Request, res: Response, next: NextFunctio
 
 export const getTree = async (req: Request, res: Response, next: NextFunction) => {
   const { owner, repo } = req.params;
-  const ref = (req.query.ref as string) || 'main';
+  const ref = typeof req.query.ref === 'string' ? req.query.ref.trim() : '';
   const path = (req.query.path as string) || '';
   try {
     const token = await resolveAccessToken(req);
     const encodedPath = path ? `/${encodeURIComponent(path)}` : '';
-    const url = `${GITHUB_API}/repos/${owner}/${repo}/contents${encodedPath}?ref=${encodeURIComponent(ref)}`;
+    const refQuery = ref ? `?ref=${encodeURIComponent(ref)}` : '';
+    const url = `${GITHUB_API}/repos/${owner}/${repo}/contents${encodedPath}${refQuery}`;
     const result = await requestJson<any>(url, { headers: buildHeaders(token) }, 'Failed to fetch tree');
 
     // If folder, GitHub returns array
@@ -57,7 +58,7 @@ export const getTree = async (req: Request, res: Response, next: NextFunction) =
         size: e.size,
         sha: e.sha,
       }));
-      return res.json({ entries, branch: ref });
+      return res.json({ entries, branch: ref || undefined });
     }
 
     // If file was requested
@@ -77,14 +78,15 @@ export const getTree = async (req: Request, res: Response, next: NextFunction) =
 
 export const getFile = async (req: Request, res: Response, next: NextFunction) => {
   const { owner, repo } = req.params;
-  const ref = (req.query.ref as string) || 'main';
+  const ref = typeof req.query.ref === 'string' ? req.query.ref.trim() : '';
   const path = (req.query.path as string) || '';
   if (!path) return res.status(400).json({ error: 'Missing path' });
 
   try {
     const token = await resolveAccessToken(req);
     const encodedPath = `/${encodeURIComponent(path)}`;
-    const url = `${GITHUB_API}/repos/${owner}/${repo}/contents${encodedPath}?ref=${encodeURIComponent(ref)}`;
+    const refQuery = ref ? `?ref=${encodeURIComponent(ref)}` : '';
+    const url = `${GITHUB_API}/repos/${owner}/${repo}/contents${encodedPath}${refQuery}`;
     const result = await requestJson<any>(url, { headers: buildHeaders(token) }, 'Failed to fetch file');
 
     if (result.type !== 'file') return res.status(400).json({ error: 'Path is not a file' });
