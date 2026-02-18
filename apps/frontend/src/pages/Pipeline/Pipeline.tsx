@@ -1,6 +1,7 @@
 
 import * as React from "react";
 import { useState, useRef, useCallback } from "react";
+import { usePageLoading } from "../../hooks/usePageLoading";
 import PipelineHeader from "./components/PipelineHeader";
 import UploadEditor from "./components/UploadEditor";
 import SidebarPreview from "./components/SidebarPreview";
@@ -13,12 +14,7 @@ export interface FileUploadState {
 }
 
 const Pipeline: React.FC = () => {
-    const [isSimulatingLoad, setIsSimulatingLoad] = useState(true);
-
-    React.useEffect(() => {
-        const timer = setTimeout(() => setIsSimulatingLoad(false), 2000);
-        return () => clearTimeout(timer);
-    }, []);
+    const { isLoading: isSimulatingLoad } = usePageLoading('pipeline');
 
     const [uploadState, setUploadState] = useState<FileUploadState>({
         file: null,

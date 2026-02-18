@@ -32,7 +32,7 @@ export const DashboardCard: React.FC<CardProps> = ({
                     {extra && <div className="text-xs text-slate-500 font-medium">{extra}</div>}
                 </div>
             )}
-            <div className={`bg-white dark:bg-[#161d2b] p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden ${bodyClassName}`}>
+            <div className={` p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden ${bodyClassName}`}>
                 {children}
             </div>
         </div>

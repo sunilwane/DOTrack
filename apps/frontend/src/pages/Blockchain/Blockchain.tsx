@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, type ChangeEvent } from 'react';
+import { useState, type ChangeEvent } from 'react';
+import { usePageLoading } from '../../hooks/usePageLoading';
 import Sidebar from '../../Components/common/Sidebar';
 import { BlockchainNetworkCard } from '../../Components/common/Blockchain/BlockchainNetworkCard';
 import { CICDProviderCard } from '../../Components/common/Blockchain/CICDProviderCard';
@@ -12,16 +13,11 @@ import { blockchainNetworks, cicdProviders, connectedWallets } from '../../mock/
 import { Skeleton } from '../../Components/Skeleton';
 
 export default function BlockchainPage() {
+  const { isLoading: isSimulatingLoad } = usePageLoading('blockchain');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [discordWebhook, setDiscordWebhook] = useState("");
-  const [isSimulatingLoad, setIsSimulatingLoad] = useState(true);
   const [awsAccessKey, setAwsAccessKey] = useState("AKIA****************");
   const [awsSecretKey, setAwsSecretKey] = useState("********************************");
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsSimulatingLoad(false), 2000);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleSwitchNetwork = () => {
   };

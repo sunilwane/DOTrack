@@ -1,15 +1,10 @@
-import { useState, useEffect } from "react";
+import { usePageLoading } from "../../hooks/usePageLoading";
 import { Button } from "../../Components/common/Button";
 import { mockRegisterProjectData, mockRegistrationSteps } from "../../mock/PagesMockData/registerProjects";
 import { Skeleton } from "../../Components/Skeleton";
 
 const RegisterProject: React.FC = () => {
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        const timer = setTimeout(() => setIsLoading(false), 2000);
-        return () => clearTimeout(timer);
-    }, []);
+    const { isLoading } = usePageLoading('register_project');
     return (
         <main className="flex-1 flex justify-center py-12 px-4 w-full">
             <div className="w-full max-w-[1000px] flex flex-col gap-8">

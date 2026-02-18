@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
+import { usePageLoading } from "../../hooks/usePageLoading";
 import { Button } from "../../Components/common/Button";
 import ProjectCard from "./ProjectCard";
 import Pagination from "../../Components/common/Pagination";
@@ -22,15 +23,11 @@ const ITEMS_PER_PAGE = 8;
 const Projects: React.FC = () => {
     const [repos, setRepos] = useState<GithubRepo[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [isSimulatingLoad, setIsSimulatingLoad] = useState(true);
+    const { isLoading: isSimulatingLoad } = usePageLoading('projects');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
 
     const navigate = useNavigate();
-    useEffect(() => {
-        const timer = setTimeout(() => setIsSimulatingLoad(false), 2000);
-        return () => clearTimeout(timer);
-    }, []);
 
     useEffect(() => {
         const fetchRepos = async () => {

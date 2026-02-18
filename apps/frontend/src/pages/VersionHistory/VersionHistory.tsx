@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
+import { usePageLoading } from "../../hooks/usePageLoading";
 import { mockVersions } from "../../mock/PagesMockData/versionHistory";
 import { useStageAnimation } from "../../Components/common/StageAnimation";
 import TimelineEntry from "./TimelineEntry";
@@ -7,12 +8,7 @@ import { Skeleton } from "../../Components/Skeleton";
 
 const VersionHistory: React.FC = () => {
     const [selectedVersions, setSelectedVersions] = useState<string[]>([]);
-    const [isSimulatingLoad, setIsSimulatingLoad] = useState(true);
-
-    React.useEffect(() => {
-        const timer = setTimeout(() => setIsSimulatingLoad(false), 2000);
-        return () => clearTimeout(timer);
-    }, []);
+    const { isLoading: isSimulatingLoad } = usePageLoading('version_history');
 
 
     const stageItems = React.useMemo(() =>

@@ -7,7 +7,7 @@ export interface OAuthConfig {
 }
 
 export class OAuthService {
-  
+
   buildGoogleAuthUrl(config: OAuthConfig, returnTo: string = '/'): string {
     const state = encodeURIComponent(JSON.stringify({ returnTo }));
     return `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(
@@ -19,7 +19,7 @@ export class OAuthService {
     )}&access_type=offline&prompt=consent&state=${state}`;
   }
 
-  
+
   buildGithubAuthUrl(config: OAuthConfig, returnTo: string = '/'): string {
     const state = encodeURIComponent(JSON.stringify({ returnTo }));
     return `https://github.com/login/oauth/authorize?client_id=${encodeURIComponent(
@@ -29,7 +29,7 @@ export class OAuthService {
     )}&scope=${encodeURIComponent('read:user repo user:email')}&state=${state}`;
   }
 
-  
+
   async exchangeGoogleCode(config: OAuthConfig, code: string): Promise<any> {
     const params = new URLSearchParams();
     params.append('code', code);
@@ -51,7 +51,7 @@ export class OAuthService {
     return await response.json();
   }
 
- 
+
   async exchangeGithubCode(config: OAuthConfig, code: string): Promise<any> {
     const response = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
@@ -71,7 +71,7 @@ export class OAuthService {
     return await response.json();
   }
 
-  
+
   parseState(state?: string): { returnTo: string } {
     if (!state) {
       return { returnTo: '/' };

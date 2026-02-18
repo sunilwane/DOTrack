@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { usePageLoading } from "../../hooks/usePageLoading";
 import { Footer } from "../../Components/layout/Footer";
 import Pagination from "../../Components/common/Pagination";
 import { TemplateCardComponent } from "../../Components/common/marketplace/TemplateCard";
@@ -8,18 +9,13 @@ import { Skeleton } from "../../Components/Skeleton";
 import type { TemplateCard } from "types";
 
 const MarketPlace = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  const { isLoading } = usePageLoading('marketplace');
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedQuickFilter, setSelectedQuickFilter] = useState("Popular");
   const [currentPage, setCurrentPage] = useState(1);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateCard | null>(null);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 2000);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleDeploy = (template: TemplateCard) => {
     setSelectedTemplate(template);

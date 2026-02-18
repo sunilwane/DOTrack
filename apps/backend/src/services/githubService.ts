@@ -1,7 +1,6 @@
-import { IUser } from '../models/user.model';
+import { createGitHubClient } from '../utils/http.util';
 
-
-interface GitHubRepo {
+export interface GitHubRepo {
   id: number;
   name: string;
   full_name: string;
@@ -15,144 +14,107 @@ interface GitHubRepo {
   open_issues_count: number;
 }
 
-interface GitHubCollaborator {
+export interface GitHubCollaborator {
   login: string;
   id: number;
   avatar_url: string;
   html_url: string;
 }
 
+export interface GitHubUser {
+  id: number;
+  login: string;
+  name?: string;
+  email?: string;
+  avatar_url: string;
+  html_url: string;
+}
+
+export interface GitHubEmail {
+  email: string;
+  primary: boolean;
+  verified: boolean;
+  visibility: string | null;
+}
+
 export class GitHubService {
-  private readonly baseUrl = 'https://api.github.com';
 
-  
   async getUserRepos(accessToken: string): Promise<GitHubRepo[]> {
-    const response = await fetch(`${this.baseUrl}/user/repos?per_page=100`, {
-      headers: {
-        Authorization: `token ${accessToken}`,
-        Accept: 'application/vnd.github.v3+json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch repos: ${response.statusText}`);
-    }
-
-    return await response.json();
+    const client = createGitHubClient(accessToken);
+    return await client.get<GitHubRepo[]>('/user/repos', { params: { per_page: 100 } });
   }
 
-  
   async getRepoCollaborators(
     accessToken: string,
     owner: string,
     repo: string
   ): Promise<GitHubCollaborator[]> {
-    const response = await fetch(
-      `${this.baseUrl}/repos/${owner}/${repo}/collaborators?per_page=20`,
-      {
-        headers: {
-          Authorization: `token ${accessToken}`,
-          Accept: 'application/vnd.github.v3+json',
-        },
+    const client = createGitHubClient(accessToken);
+    try {
+      const data = await client.get<any[]>(`/repos/${owner}/${repo}/collaborators`, { params: { per_page: 20 } });
+      if (Array.isArray(data)) {
+        return this.mapToCollaborator(data);
       }
-    );
-
-    if (response.ok) {
-      const data = await response.json();
-      if (Array.isArray(data) && data.length > 0) {
-        return data.map((c: any) => ({
-          login: c.login,
-          id: c.id,
-          avatar_url: c.avatar_url,
-          html_url: c.html_url,
-        }));
-      }
+      return [];
+    } catch (error) {
+      console.error('Error fetching collaborators:', error);
+      return [];
     }
-
-    return [];
   }
 
-  
   async getRepoContributors(
     accessToken: string,
     owner: string,
     repo: string
   ): Promise<GitHubCollaborator[]> {
-    const response = await fetch(
-      `${this.baseUrl}/repos/${owner}/${repo}/contributors?per_page=20`,
-      {
-        headers: {
-          Authorization: `token ${accessToken}`,
-          Accept: 'application/vnd.github.v3+json',
-        },
-      }
-    );
-
-    if (!response.ok) {
+    const client = createGitHubClient(accessToken);
+    try {
+      const data = await client.get<any[]>(`/repos/${owner}/${repo}/contributors`, { params: { per_page: 20 } });
+      return this.mapToCollaborator(data);
+    } catch (error) {
+      console.error('Error fetching contributors:', error);
       return [];
     }
-
-    const data = await response.json();
-    return data.map((c: any) => ({
-      login: c.login,
-      id: c.id,
-      avatar_url: c.avatar_url,
-      html_url: c.html_url,
-    }));
   }
-
 
   async getRepoCollaboratorsOrContributors(
     accessToken: string,
     owner: string,
     repo: string
   ): Promise<GitHubCollaborator[]> {
-    
     const collaborators = await this.getRepoCollaborators(accessToken, owner, repo);
     if (collaborators.length > 0) {
       return collaborators;
     }
-
-   
     return await this.getRepoContributors(accessToken, owner, repo);
   }
 
-  
-  async getUserInfo(accessToken: string): Promise<any> {
-    const response = await fetch(`${this.baseUrl}/user`, {
-      headers: {
-        Authorization: `token ${accessToken}`,
-        Accept: 'application/vnd.github.v3+json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch GitHub user info');
-    }
-
-    return await response.json();
+  async getUserInfo(accessToken: string): Promise<GitHubUser> {
+    const client = createGitHubClient(accessToken);
+    return await client.get<GitHubUser>('/user');
   }
 
-  
   async getUserPrimaryEmail(accessToken: string): Promise<string | undefined> {
-    const response = await fetch(`${this.baseUrl}/user/emails`, {
-      headers: {
-        Authorization: `token ${accessToken}`,
-        Accept: 'application/vnd.github.v3+json',
-      },
-    });
-
-    if (!response.ok) {
-      return undefined;
+    const client = createGitHubClient(accessToken);
+    try {
+      const emails = await client.get<GitHubEmail[]>('/user/emails');
+      if (Array.isArray(emails)) {
+        const primary = emails.find((e) => e.primary) || emails[0];
+        return primary?.email;
+      }
+    } catch (error) {
+      console.error('Error fetching user emails:', error);
     }
-
-    const emails = await response.json();
-    if (Array.isArray(emails)) {
-      const primary = emails.find((e: any) => e.primary) || emails[0];
-      return primary?.email;
-    }
-
     return undefined;
+  }
+
+  private mapToCollaborator(data: any[]): GitHubCollaborator[] {
+    return data.map((c) => ({
+      login: c.login,
+      id: c.id,
+      avatar_url: c.avatar_url,
+      html_url: c.html_url,
+    }));
   }
 }
 

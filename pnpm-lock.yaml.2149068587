@@ -7845,9 +7845,9 @@ snapshots:
       '@react-aria/ssr': 3.9.10(react@19.2.4)
       '@react-aria/utils': 3.32.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@react-aria/visually-hidden': 3.8.29(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@react-stately/overlays': 3.6.21(react@19.2.4)
+      '@react-stately/overlays': 3.6.22(react@19.2.4)
       '@react-types/button': 3.14.1(react@19.2.4)
-      '@react-types/overlays': 3.9.2(react@19.2.4)
+      '@react-types/overlays': 3.9.3(react@19.2.4)
       '@react-types/shared': 3.33.0(react@19.2.4)
       '@swc/helpers': 0.5.18
       react: 19.2.4
@@ -8315,7 +8315,7 @@ snapshots:
       '@react-stately/collections': 3.12.8(react@19.2.4)
       '@react-stately/form': 3.2.2(react@19.2.4)
       '@react-stately/list': 3.13.2(react@19.2.4)
-      '@react-stately/overlays': 3.6.21(react@19.2.4)
+      '@react-stately/overlays': 3.6.22(react@19.2.4)
       '@react-stately/select': 3.9.1(react@19.2.4)
       '@react-stately/utils': 3.11.0(react@19.2.4)
       '@react-types/combobox': 3.13.10(react@19.2.4)
@@ -8340,7 +8340,7 @@ snapshots:
       '@internationalized/date': 3.10.1
       '@internationalized/string': 3.2.7
       '@react-stately/form': 3.2.2(react@19.2.4)
-      '@react-stately/overlays': 3.6.21(react@19.2.4)
+      '@react-stately/overlays': 3.6.22(react@19.2.4)
       '@react-stately/utils': 3.11.0(react@19.2.4)
       '@react-types/datepicker': 3.13.3(react@19.2.4)
       '@react-types/shared': 3.33.0(react@19.2.4)
@@ -8419,7 +8419,7 @@ snapshots:
 
   '@react-stately/menu@3.9.0(react@19.2.4)':
     dependencies:
-      '@react-stately/overlays': 3.6.21(react@19.2.4)
+      '@react-stately/overlays': 3.6.22(react@19.2.4)
       '@react-types/menu': 3.10.5(react@19.2.4)
       '@react-types/shared': 3.33.0(react@19.2.4)
       '@swc/helpers': 0.5.18
@@ -8445,7 +8445,7 @@ snapshots:
   '@react-stately/overlays@3.6.12(react@19.2.4)':
     dependencies:
       '@react-stately/utils': 3.11.0(react@19.2.4)
-      '@react-types/overlays': 3.9.2(react@19.2.4)
+      '@react-types/overlays': 3.9.3(react@19.2.4)
       '@swc/helpers': 0.5.18
       react: 19.2.4
 
@@ -8590,7 +8590,7 @@ snapshots:
 
   '@react-stately/tooltip@3.5.0(react@19.2.4)':
     dependencies:
-      '@react-stately/overlays': 3.6.21(react@19.2.4)
+      '@react-stately/overlays': 3.6.22(react@19.2.4)
       '@react-types/tooltip': 3.5.0(react@19.2.4)
       '@swc/helpers': 0.5.18
       react: 19.2.4
@@ -8727,7 +8727,7 @@ snapshots:
     dependencies:
       '@internationalized/date': 3.10.1
       '@react-types/calendar': 3.8.1(react@19.2.4)
-      '@react-types/overlays': 3.9.2(react@19.2.4)
+      '@react-types/overlays': 3.9.3(react@19.2.4)
       '@react-types/shared': 3.33.0(react@19.2.4)
       react: 19.2.4
 
@@ -8780,7 +8780,7 @@ snapshots:
 
   '@react-types/menu@3.9.13(react@19.2.4)':
     dependencies:
-      '@react-types/overlays': 3.9.2(react@19.2.4)
+      '@react-types/overlays': 3.9.3(react@19.2.4)
       '@react-types/shared': 3.33.0(react@19.2.4)
       react: 19.2.4
 
@@ -8890,7 +8890,7 @@ snapshots:
 
   '@react-types/tooltip@3.4.13(react@19.2.4)':
     dependencies:
-      '@react-types/overlays': 3.9.2(react@19.2.4)
+      '@react-types/overlays': 3.9.3(react@19.2.4)
       '@react-types/shared': 3.33.0(react@19.2.4)
       react: 19.2.4
 
