@@ -1,0 +1,8 @@
+[build]
+builder = "NIXPACKS"
+
+[build.nixpacksConfig]
+node_version = "20"
+
+[deploy]
+startCommand = "pnpm --filter backend start"

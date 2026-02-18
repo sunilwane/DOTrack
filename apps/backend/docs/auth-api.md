@@ -56,14 +56,14 @@ Overview:
 - `POST /api/auth/refresh` expects the cookie and returns a new `accessToken` in the JSON body while rotating the refresh cookie.
 
 Prerequisites:
-- Backend running (default `http://localhost:5000` or your `PORT`).
+- Backend running (default `https://backend-production-0dbd.up.railway.app` or your `PORT`).
 - Cookies must be preserved/sent by your client (Postman, browser, or curl with cookie jar).
 
 Steps — Postman (recommended for manual tests):
 1. Send `POST /api/auth/signin` with JSON body `{ "email": "user@example.com", "password": "..." }`.
    - Response body includes `accessToken`.
    - The server sets an HttpOnly cookie named `refreshToken` (check Postman's Cookies tab).
-2. With the cookie present, send `POST /api/auth/refresh` to `http://localhost:5000/api/auth/refresh`.
+2. With the cookie present, send `POST /api/auth/refresh` to `https://backend-production-0dbd.up.railway.app/api/auth/refresh`.
    - Ensure Postman will send cookies for that host (Cookies tab or enable `Send cookies`/`Automatically follow redirects`).
 3. Inspect the response JSON — you should receive a new `{ "accessToken": "<jwt>" }`.
 4. Inspect response `Set-Cookie` headers — the `refreshToken` cookie will be rotated (new value and expiry).
@@ -72,7 +72,7 @@ Steps — curl (command-line):
 1. Sign in and save cookies:
 
 ```bash
-curl -i -c cookiejar.txt -X POST http://localhost:5000/api/auth/signin \
+curl -i -c cookiejar.txt -X POST https://backend-production-0dbd.up.railway.app/api/auth/signin \
   -H 'Content-Type: application/json' \
   -d '{"email":"user@example.com","password":"T0pS3cret!"}'
 ```
@@ -80,7 +80,7 @@ curl -i -c cookiejar.txt -X POST http://localhost:5000/api/auth/signin \
 2. Call refresh using the saved cookie jar:
 
 ```bash
-curl -i -b cookiejar.txt -X POST http://localhost:5000/api/auth/refresh
+curl -i -b cookiejar.txt -X POST https://backend-production-0dbd.up.railway.app/api/auth/refresh
 ```
 
 - Check the response body for the new `accessToken` and `Set-Cookie` headers for the rotated `refreshToken`.
