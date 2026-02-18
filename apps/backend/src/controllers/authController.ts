@@ -8,6 +8,7 @@ import { signupSchema, signinSchema } from '../utils/validators';
 import UserModel from '../models/user.model';
 import { getRefreshCookieOptions } from '../utils/cookies';
 import { AuthRequest } from '../middlewares/authMiddleware';
+import { normalizeFrontendBaseUrl, normalizeReturnToPath } from '../utils/origin';
 
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -106,7 +107,7 @@ export const googleCallback = async (req: Request, res: Response, next: NextFunc
     const clientId = process.env.GOOGLE_CLIENT_ID as string;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET as string;
     const callback = process.env.GOOGLE_CALLBACK_URL as string;
-    const frontend = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const frontend = normalizeFrontendBaseUrl(process.env.FRONTEND_URL, 'http://localhost:3000');
 
     if (!code) return res.status(400).json({ error: 'Missing code' });
 
@@ -130,7 +131,7 @@ export const googleCallback = async (req: Request, res: Response, next: NextFunc
     res.cookie('refreshToken', tokens.refreshToken, cookieOptions);
 
     const { returnTo } = oauthService.parseState(state);
-    res.redirect(`${frontend}${returnTo}`);
+    res.redirect(`${frontend}${normalizeReturnToPath(returnTo)}`);
   } catch (err) {
     next(err);
   }
@@ -156,7 +157,7 @@ export const githubCallback = async (req: Request, res: Response, next: NextFunc
     const clientId = process.env.GITHUB_CLIENT_ID as string;
     const clientSecret = process.env.GITHUB_CLIENT_SECRET as string;
     const callback = process.env.GITHUB_CALLBACK_URL as string;
-    const frontend = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const frontend = normalizeFrontendBaseUrl(process.env.FRONTEND_URL, 'http://localhost:3000');
 
     if (!code) return res.status(400).json({ error: 'Missing code' });
 
@@ -186,7 +187,7 @@ export const githubCallback = async (req: Request, res: Response, next: NextFunc
     res.cookie('refreshToken', tokens.refreshToken, cookieOptions);
 
     const { returnTo } = oauthService.parseState(state);
-    res.redirect(`${frontend}${returnTo}`);
+    res.redirect(`${frontend}${normalizeReturnToPath(returnTo)}`);
   } catch (err) {
     next(err);
   }
