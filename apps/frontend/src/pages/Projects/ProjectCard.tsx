@@ -1,14 +1,10 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import { SimpleTooltip } from "../../Components/common/SimpleTooltip";
 import type { ProjectCardData } from "../../mock/PagesMockData/projects";
-
-interface Collaborator {
-    id: number | string;
-    login: string;
-    avatar_url: string;
-    html_url: string;
-}
+import { authService } from "../../services/authService";
+import { githubService, type GithubCollaborator } from "../../services/githubService";
 
 interface ProjectCardProps extends Partial<ProjectCardData> {
     name?: string;
@@ -22,8 +18,6 @@ interface ProjectCardProps extends Partial<ProjectCardData> {
     repoId?: number | string;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-
 const ProjectCard: React.FC<ProjectCardProps> = ({
     name = 'Unknown',
     repo = 'unknown/repo',
@@ -35,8 +29,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
     ownerAvatarUrl,
     repoId
 }) => {
-    const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
+    const [collaborators, setCollaborators] = useState<GithubCollaborator[]>([]);
     const [isLoadingCollabs, setIsLoadingCollabs] = useState(true);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchCollaborators = async () => {
@@ -50,22 +46,13 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                     setIsLoadingCollabs(false);
                     return;
                 }
-                const token = localStorage.getItem('accessToken');
+                const token = authService.getAccessToken();
                 if (!token) {
                     setIsLoadingCollabs(false);
                     return;
                 }
-                const res = await fetch(
-                    `${API_BASE_URL}/api/auth/github/repos/${owner}/${repoName}/collaborators`,
-                    {
-                        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-                        credentials: 'include',
-                    }
-                );
-                if (res.ok) {
-                    const data = await res.json();
-                    setCollaborators(Array.isArray(data) ? data : []);
-                }
+                const data = await githubService.getRepoCollaborators(owner, repoName);
+                setCollaborators(Array.isArray(data) ? data : []);
             } catch (e) {
                 console.error('Error fetching collaborators:', e);
             } finally {
@@ -101,7 +88,29 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
     const config = statusConfig[status];
 
     return (
-        <div className={`bg-white dark:bg-[#161616] border border-primary/50 rounded-xl p-5 transition-all group relative overflow-hidden`}>
+        <div
+            role="button"
+            tabIndex={0}
+            onClick={() => {
+                if (!repo) return;
+                const parts = repo.split('/');
+                if (parts.length < 2) return;
+                const owner = parts[0];
+                const repoName = parts.slice(1).join('/');
+                navigate(`/projects/${owner}/${repoName}`);
+            }}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                    if (!repo) return;
+                    const parts = repo.split('/');
+                    if (parts.length < 2) return;
+                    const owner = parts[0];
+                    const repoName = parts.slice(1).join('/');
+                    navigate(`/projects/${owner}/${repoName}`);
+                }
+            }}
+            className={`bg-white dark:bg-[#161616] border border-primary/50 rounded-xl p-5 transition-all group relative overflow-hidden cursor-pointer`}
+        >
             <div className="absolute top-0 right-0 p-3">
                 <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full ${config.bg} ${config.text} text-[10px] font-bold uppercase tracking-wider border ${config.border}`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`}></span>

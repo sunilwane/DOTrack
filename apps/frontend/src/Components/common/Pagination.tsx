@@ -65,15 +65,17 @@ const Pagination = ({
                 {onItemsPerPageChange && (
                     <div className="flex items-center gap-2">
                         <span className="text-xs text-slate-400">Per page:</span>
+
+                        <span className="text-xs font-semibold text-white">{itemsPerPage}</span>
                         <Select
                             size="sm"
                             selectedKeys={[itemsPerPage.toString()]}
                             onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
-                            className="w-20"
+                            className="w-10"
                             classNames={{
-                                trigger: "bg-slate-800 border-slate-700 data-[hover=true]:bg-slate-700 h-8 min-h-8",
-                                value: "text-xs text-white font-semibold",
-                                popoverContent: "bg-slate-800 border border-slate-700"
+                                trigger: "flex items-center justify-center bg-slate-800 border-slate-700 data-[hover=true]:bg-slate-700 h-8 min-h-8 px-2",
+                                value: "sr-only",
+                                popoverContent: "bg-slate-800 border border-slate-700 min-w-[4.5rem]"
                             }}
                         >
                             {ITEMS_PER_PAGE_OPTIONS.map((option) => (

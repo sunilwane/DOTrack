@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { PublicHeader } from "../../Components/layout/PublicHeader";
 import { Footer } from "../../Components/layout/Footer";
 import Pagination from "../../Components/common/Pagination";
 import { TemplateCardComponent } from "../../Components/common/marketplace/TemplateCard";

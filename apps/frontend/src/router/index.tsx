@@ -14,6 +14,7 @@ import RegisterProject from "../pages/RegisterProject/RegisterProject";
 import VersionHistory from "../pages/VersionHistory/VersionHistory";
 import MarketPlace from "../pages/Marketplace/Marketplace";
 import Blockchain from "../pages/Blockchain/Blockchain";
+import ProjectViewer from "../pages/Projects/ProjectViewer";
 import { AppLayout } from "../Components/layout/AppLayout";
 import { ProtectedRoute } from "../Components/ProtectedRoute";
 import { PublicRoute } from "../Components/PublicRoute";
@@ -37,6 +38,7 @@ export const AppRouter = () => {
           <Route path="/register-project" element={<RegisterProject />} />
           <Route path="/deployments" element={<Deployments />} />
           <Route path="/marketplace" element={<MarketPlace />} />
+          <Route path="/projects/:owner/:repo" element={<ProjectViewer />} />
           <Route path="/pipelines" element={<Pipeline />} />
           <Route path="/ipfs-templates" element={<Pipeline />} />
           <Route path="/audit-logs" element={<AuditDashboard />} />
