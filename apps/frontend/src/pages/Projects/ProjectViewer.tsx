@@ -62,11 +62,7 @@ const FileExplorer = ({
     setError(null);
     try {
       const res = await fetch(
-        buildGithubApiUrl(
-          owner,
-          repo,
-          `/tree?ref=${encodeURIComponent(branch)}&path=${encodeURIComponent(dirPath)}`
-        ),
+        buildApiUrl(`/api/github/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/tree?ref=${encodeURIComponent(branch)}&path=${encodeURIComponent(dirPath)}`),
         buildGithubRequestOptions()
       );
       if (res.status === 403) {
@@ -341,11 +337,7 @@ const CodeViewer = () => {
     setIsLarge(false);
     try {
       const res = await fetch(
-        buildGithubApiUrl(
-          state.owner,
-          state.repo,
-          `/file?ref=${encodeURIComponent(state.branch)}&path=${encodeURIComponent(state.path)}`
-        ),
+        buildApiUrl(`/api/github/${encodeURIComponent(state.owner)}/${encodeURIComponent(state.repo)}/file?ref=${encodeURIComponent(state.branch)}&path=${encodeURIComponent(state.path)}`),
         buildGithubRequestOptions()
       );
       if (res.status === 403) {
@@ -487,7 +479,7 @@ const BranchSelector = ({ owner, repo, currentBranch }: { owner: string; repo: s
       setLoading(true);
       try {
         const res = await fetch(
-          buildGithubApiUrl(owner, repo, '/branches'),
+          buildApiUrl(`/api/github/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/branches`),
           buildGithubRequestOptions()
         );
         if (res.ok) {
