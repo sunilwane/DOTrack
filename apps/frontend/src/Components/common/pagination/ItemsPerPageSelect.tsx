@@ -1,7 +1,8 @@
 import { Select, SelectItem } from '@heroui/react';
 import { Skeleton } from '../../Skeleton';
+import { PAGE_SIZE_OPTIONS } from '../../../constants';
 
-const ITEMS_PER_PAGE_OPTIONS = [8, 16, 24, 32];
+const ITEMS_PER_PAGE_OPTIONS = PAGE_SIZE_OPTIONS;
 
 interface ItemsPerPageSelectProps {
   isLoading?: boolean;

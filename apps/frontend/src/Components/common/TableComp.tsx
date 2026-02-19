@@ -1,14 +1,18 @@
 import {
+  Chip,
   Card,
   CardBody,
   Table,
   TableBody,
+  TableCell,
   TableColumn,
   TableHeader,
+  TableRow,
 } from '@heroui/react';
+import { Copy, ExternalLink } from 'lucide-react';
 import type { AuditEntry } from 'types';
-import AuditTableDataRow from './tableComp/AuditTableDataRow';
-import AuditTableSkeletonRows from './tableComp/AuditTableSkeletonRows';
+import { Skeleton } from '../Skeleton';
+import { getEventChipClass } from './tableComp/tableUtils';
 
 interface AuditTableProps {
   title: string;
@@ -45,10 +49,93 @@ const TableComp = ({ title, data, isLoading }: AuditTableProps) => {
 
           <TableBody>
             {isLoading ? (
-              <AuditTableSkeletonRows />
+              Array.from({ length: 5 }).map((_, index) => (
+                <TableRow key={`audit-skeleton-${index}`}>
+                  <TableCell>
+                    <div className="space-y-1">
+                      <Skeleton isLoaded={false} width="140px" height="16px" />
+                      <Skeleton isLoaded={false} width="80px" height="12px" />
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton isLoaded={false} width="100px" height="28px" className="rounded-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton isLoaded={false} width="120px" height="16px" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton isLoaded={false} width="100px" height="16px" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      <Skeleton isLoaded={false} width="80px" height="16px" />
+                      <Skeleton isLoaded={false} width="100px" height="10px" />
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton isLoaded={false} width="80px" height="28px" className="rounded-full" />
+                  </TableCell>
+                </TableRow>
+              ))
             ) : (
               data.map((row) => (
-                <AuditTableDataRow key={row.id} row={row} onCopyToClipboard={copyToClipboard} />
+                <TableRow key={row.id}>
+                  <TableCell>
+                    <div>
+                      <p>{row.timestamp}</p>
+                      <p className="text-xs text-gray-500">{row.block}</p>
+                    </div>
+                  </TableCell>
+
+                  <TableCell>
+                    <Chip
+                      size="sm"
+                      variant="flat"
+                      className={`${getEventChipClass(row.event)} font-bold text-[10px] uppercase h-7`}
+                    >
+                      {row.event}
+                    </Chip>
+                  </TableCell>
+
+                  <TableCell>
+                    <div className="flex items-center gap-2 group">
+                      <span className="font-mono">{row.wallet}</span>
+                      <button
+                        onClick={() => copyToClipboard(row.wallet)}
+                        className="text-slate-500 hover:text-white transition-colors cursor-pointer flex items-center"
+                      >
+                        <Copy size={14} />
+                      </button>
+                    </div>
+                  </TableCell>
+
+                  <TableCell className="font-mono text-purple-400">{row.ipfs}</TableCell>
+
+                  <TableCell>
+                    <div className="flex flex-col gap-0.5">
+                      <div className="flex items-center gap-1.5 text-blue-400 font-bold hover:text-blue-300 cursor-pointer transition-colors group/link">
+                        <span>{row.proof}</span>
+                        <ExternalLink size={12} className="opacity-70 group-hover/link:opacity-100" />
+                      </div>
+                      {row.proofHash && (
+                        <span className="text-[10px] text-slate-500 font-mono">{row.proofHash}</span>
+                      )}
+                    </div>
+                  </TableCell>
+
+                  <TableCell>
+                    <Chip
+                      size="sm"
+                      variant="flat"
+                      className="bg-nexus-success/20 text-nexus-success border border-nexus-success/30 font-bold text-[10px] uppercase h-7"
+                    >
+                      <div className="flex items-center gap-1 px-1">
+                        <span className="material-symbols-outlined text-[14px]">check_circle</span>
+                        {row.status}
+                      </div>
+                    </Chip>
+                  </TableCell>
+                </TableRow>
               ))
             )}
           </TableBody>

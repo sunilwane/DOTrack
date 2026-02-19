@@ -3,8 +3,8 @@
  */
 
 // Pagination
-export const DEFAULT_PAGE_SIZE = 10;
-export const PAGE_SIZE_OPTIONS = [5, 10, 20, 50, 100] as const;
+export const DEFAULT_PAGE_SIZE = 8;
+export const PAGE_SIZE_OPTIONS = [8, 16, 24, 32] as const;
 
 // API
 export const API_TIMEOUT = 30000; // 30 seconds
