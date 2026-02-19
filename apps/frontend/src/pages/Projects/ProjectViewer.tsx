@@ -30,6 +30,11 @@ const buildGithubRequestOptions = (): RequestInit => {
   };
 };
 
+const buildGithubApiUrl = (owner: string, repo: string, suffix: string): string =>
+  buildApiUrl(
+    `/api/github/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}${suffix}`
+  );
+
 const FileExplorer = ({
   owner,
   repo,
@@ -467,6 +472,7 @@ const BranchSelector = ({ owner, repo, currentBranch }: { owner: string; repo: s
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const branchListScrollRef = useRef<HTMLDivElement | null>(null);
+  const currentBranchLabel = currentBranch || 'default';
 
   useEffect(() => {
     const loadBranches = async () => {
@@ -547,11 +553,11 @@ const BranchSelector = ({ owner, repo, currentBranch }: { owner: string; repo: s
     el.scrollTop = nextTop;
   };
 
-  const visibleBranches = branches.length > 0 ? branches : [{ name: currentBranch }];
+  const visibleBranches = branches.length > 0 ? branches : [{ name: currentBranchLabel }];
 
   return (
     <div ref={dropdownRef} className="relative">
-      <SimpleTooltip label={currentBranch} placement="bottom" className="w-[220px] sm:w-[260px] max-w-[260px]">
+      <SimpleTooltip label={currentBranchLabel} placement="bottom" className="w-[220px] sm:w-[260px] max-w-[260px]">
         <button
           type="button"
           onClick={() => setIsOpen((prev) => !prev)}
@@ -562,7 +568,7 @@ const BranchSelector = ({ owner, repo, currentBranch }: { owner: string; repo: s
         >
             <span className="flex items-center gap-2 min-w-0">
             <span className="material-symbols-outlined text-base text-primary">fork_right</span>
-            <span className="text-[11px] font-medium block truncate w-[130px] sm:w-[160px]">{currentBranch}</span>
+            <span className="text-[11px] font-medium block truncate w-[130px] sm:w-[160px]">{currentBranchLabel}</span>
           </span>
           <span className="material-symbols-outlined text-base text-slate-300">
             {isOpen ? 'expand_less' : 'expand_more'}
@@ -608,7 +614,7 @@ const Inner = () => {
   const [search] = useSearchParams();
   const owner = params.owner || '';
   const repo = params.repo || '';
-  const ref = search.get('ref') || 'main';
+  const ref = search.get('ref') || '';
   const path = search.get('path') || '';
   const { state, dispatch } = useRepoState();
   const prevBranch = state.branch;

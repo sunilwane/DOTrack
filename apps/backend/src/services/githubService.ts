@@ -1,6 +1,6 @@
 import { requestJson, requestJsonOrNull } from './httpService';
 
-interface GitHubRepo {
+export interface GitHubRepo {
   id: number;
   name: string;
   full_name: string;
@@ -14,14 +14,16 @@ interface GitHubRepo {
   open_issues_count: number;
 }
 
-interface GitHubUser {
+export interface GitHubUser {
   login: string;
   id: number;
   avatar_url: string;
   html_url: string;
+  name?: string;
+  email?: string;
 }
 
-interface GitHubCollaborator {
+export interface GitHubCollaborator {
   login: string;
   id: number;
   avatar_url: string;
@@ -107,8 +109,8 @@ export class GitHubService {
     return this.getRepoContributors(accessToken, owner, repo);
   }
 
-  async getUserInfo(accessToken: string): Promise<any> {
-    return requestJson<any>(
+  async getUserInfo(accessToken: string): Promise<GitHubUser> {
+    return requestJson<GitHubUser>(
       `${this.baseUrl}/user`,
       {
         headers: this.buildHeaders(accessToken),

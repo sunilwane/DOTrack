@@ -4,14 +4,15 @@ import { createPortal } from "react-dom";
 export type TooltipPlacement = "top" | "bottom" | "left" | "right";
 
 interface SimpleTooltipProps {
-   
+
     label: React.ReactNode;
-    
+
     placement?: TooltipPlacement;
-   
+
     delay?: number;
-    
+
     className?: string;
+    style?: React.CSSProperties;
     children: React.ReactElement;
 }
 
@@ -44,6 +45,7 @@ export const SimpleTooltip: React.FC<SimpleTooltipProps> = ({
     placement = "right",
     delay = 0,
     className = "",
+    style,
     children,
 }) => {
     const [isVisible, setIsVisible] = React.useState(false);
@@ -81,6 +83,7 @@ export const SimpleTooltip: React.FC<SimpleTooltipProps> = ({
         <div
             ref={triggerRef}
             className={`inline-block ${className}`}
+            style={style}
             onMouseEnter={showTooltip}
             onMouseLeave={hideTooltip}
         >

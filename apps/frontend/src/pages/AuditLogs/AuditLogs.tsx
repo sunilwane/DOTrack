@@ -1,4 +1,5 @@
 import * as React from "react";
+import { usePageLoading } from "../../hooks/usePageLoading";
 import { Button } from "../../Components/common/Button";
 import Pagination from "../../Components/common/Pagination";
 import StatsGrid from "../../Components/common/StatsGrid";
@@ -15,12 +16,7 @@ const iconMap = {
 };
 
 const AuditDashboard: React.FC = () => {
-    const [isSimulatingLoad, setIsSimulatingLoad] = React.useState(true);
-
-    React.useEffect(() => {
-        const timer = setTimeout(() => setIsSimulatingLoad(false), 2000);
-        return () => clearTimeout(timer);
-    }, []);
+    const { isLoading: isSimulatingLoad } = usePageLoading('audit_logs');
 
     const statsWithIcons = AuditStats.map(stat => ({
         ...stat,

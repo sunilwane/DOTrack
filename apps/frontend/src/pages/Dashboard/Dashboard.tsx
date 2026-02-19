@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { usePageLoading } from '../../hooks/usePageLoading';
 import { StatusBadge } from '../../Components/common/StatusBadge';
 import { Button } from '../../Components/common/Button';
 import { DashboardCard } from '../../Components/common/DashboardCard';
@@ -6,14 +6,15 @@ import { PipelineStages, RecentDeployments, DashboardStats } from '../../mock/Pa
 import PipelineTracker from './PipelineTracker';
 import RecentDeploymentsTable from './RecentDeploymentsTable';
 import { Skeleton } from '../../Components/Skeleton';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
-    const [isLoading, setIsLoading] = useState(true);
+    const { isLoading } = usePageLoading('dashboard');
+    const navigate = useNavigate();
 
-    useEffect(() => {
-        const timer = setTimeout(() => setIsLoading(false), 2000);
-        return () => clearTimeout(timer);
-    }, []);
+    const handleNavigateToMainDashboard = () => {
+        navigate('/main-dashboard');
+    };
 
     return (
         <div className="flex flex-col min-h-full p-4 space-y-0 max-w-7xl mx-auto w-full transition-all duration-500">
@@ -47,9 +48,13 @@ const Dashboard = () => {
                 </div>
                 <div className="ml-auto flex items-center gap-5">
                     <Skeleton isLoaded={!isLoading} variant="button" width="80px" height="32px">
-                        <button className="text-[9px] font-black uppercase tracking-wider rounded border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-primary hover:border-primary transition-colors cursor-pointer px-3 h-8">
+                        <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="text-[9px] font-black uppercase tracking-wider h-8"
+                        >
                             Export CSV
-                        </button>
+                        </Button>
                     </Skeleton>
 
                     <Skeleton isLoaded={!isLoading} variant="button" width="100px" height="32px">
@@ -60,6 +65,17 @@ const Dashboard = () => {
                             icon={<span className="material-symbols-outlined text-[16px]">open_in_new</span>}
                         >
                             <span className='text-sm'>Etherscan</span>
+                        </Button>
+                    </Skeleton>
+                    <Skeleton isLoaded={!isLoading} variant="button" width="100px" height="32px">
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            className="h-8 text-[11px]"
+                            icon={<span className="material-symbols-outlined text-[16px]">dashboard</span>}
+                            onClick={handleNavigateToMainDashboard}
+                        >
+                            <span className='text-sm'>Main</span>
                         </Button>
                     </Skeleton>
                 </div>

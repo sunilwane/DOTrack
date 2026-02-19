@@ -30,33 +30,28 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
     repoId
 }) => {
     const [collaborators, setCollaborators] = useState<GithubCollaborator[]>([]);
-    const [isLoadingCollabs, setIsLoadingCollabs] = useState(true);
 
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchCollaborators = async () => {
             if (!repo || !repoId) {
-                setIsLoadingCollabs(false);
                 return;
             }
             try {
                 const [owner, repoName] = repo.split('/');
                 if (!owner || !repoName) {
-                    setIsLoadingCollabs(false);
                     return;
                 }
                 const token = authService.getAccessToken();
                 if (!token) {
-                    setIsLoadingCollabs(false);
                     return;
                 }
+
                 const data = await githubService.getRepoCollaborators(owner, repoName);
                 setCollaborators(Array.isArray(data) ? data : []);
             } catch (e) {
                 console.error('Error fetching collaborators:', e);
-            } finally {
-                setIsLoadingCollabs(false);
             }
         };
         fetchCollaborators();
@@ -142,19 +137,17 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                 </div>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center h-8 relative" style={{ width: collaborators.length > 3 ? '80px' : `${Math.max(collaborators.length, 1) * 20 + 8}px` }}>
-                        {isLoadingCollabs ? (
-                            <div className="text-xs text-slate-400">Loading...</div>
-                        ) : collaborators.length > 0 ? (
+                        {collaborators.length > 0 ? (
                             <>
                                 {collaborators.slice(0, 3).map((collab, index) => (
                                     <SimpleTooltip
                                         key={collab.id}
                                         label={collab.login}
                                         placement="top"
+                                        style={{ left: `${index * 20}px`, zIndex: 3 - index, position: 'absolute' }}
                                     >
                                         <div
-                                            className="w-8 h-8 rounded-full overflow-hidden border-2 border-white dark:border-[#161616] absolute flex-shrink-0"
-                                            style={{ left: `${index * 20}px`, zIndex: 3 - index }}
+                                            className="w-8 h-8 rounded-full overflow-hidden border-2 border-white dark:border-[#161616] flex-shrink-0"
                                         >
                                             <img
                                                 src={collab.avatar_url}
@@ -178,10 +171,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                                             </div>
                                         }
                                         placement="top"
+                                        style={{ left: `${Math.min(3, collaborators.length - 1) * 20}px`, zIndex: 0, position: 'absolute' }}
                                     >
                                         <div
-                                            className="w-8 h-8 rounded-full flex items-center justify-center bg-slate-200 dark:bg-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 border-2 border-white dark:border-[#161616] absolute flex-shrink-0 cursor-pointer hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
-                                            style={{ left: `${Math.min(3, collaborators.length - 1) * 20}px`, zIndex: 0 }}
+                                            className="w-8 h-8 rounded-full flex items-center justify-center bg-slate-200 dark:bg-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 border-2 border-white dark:border-[#161616] flex-shrink-0 cursor-pointer hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
                                         >
                                             +{collaborators.length - 3}
                                         </div>

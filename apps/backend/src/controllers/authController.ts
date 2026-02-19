@@ -1,232 +1,190 @@
-import { Request, Response, NextFunction } from 'express';
-import * as authService from '../services/authService';
+import { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
+import { asyncHandler } from '../utils/asyncHandler';
+import { signupSchema, signinSchema } from '../utils/validators';
+import { getRefreshCookieOptions } from '../utils/cookies';
+import { AuthRequest } from '../middlewares/authMiddleware';
+import * as AuthService from '../services/authService';
+import * as UserService from '../services/user.service';
+import * as TokenService from '../services/token.service';
 import { githubService } from '../services/githubService';
 import { oauthService } from '../services/oauthService';
 import RevokedTokenModel from '../models/revokedToken.model';
-import jwt from 'jsonwebtoken';
-import { signupSchema, signinSchema } from '../utils/validators';
-import UserModel from '../models/user.model';
-import { getRefreshCookieOptions } from '../utils/cookies';
-import { AuthRequest } from '../middlewares/authMiddleware';
+import { generateAccessToken } from '../utils/jwt.util';
 import { normalizeFrontendBaseUrl, normalizeReturnToPath } from '../utils/origin';
 
-export const signup = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const parsed = signupSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ error: parsed.error.issues.map((e: any) => e.message) });
-    const user = await authService.createUser(parsed.data);
-    res.status(201).json(user);
-  } catch (err) {
-    console.error('signup error', err);
-    res.status(400).json({ error: 'Unable to complete request' });
+export const signup = asyncHandler(async (req: Request, res: Response) => {
+  const parsed = signupSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.issues.map((e: any) => e.message) });
   }
-};
 
-export const signin = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const parsed = signinSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ error: parsed.error.issues.map((e: any) => e.message) });
-    const { accessToken, refreshToken } = await authService.authenticateUser(parsed.data as any);
-    const cookieOptions = getRefreshCookieOptions();
-    res.cookie('refreshToken', refreshToken, cookieOptions);
-    res.json({ accessToken });
-  } catch (err) {
-    console.error('signin error', err);
-    res.status(401).json({ error: 'Invalid credentials' });
+  const user = await AuthService.createUser(parsed.data);
+  res.status(201).json(user);
+});
+
+export const signin = asyncHandler(async (req: Request, res: Response) => {
+  const parsed = signinSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.issues.map((e: any) => e.message) });
   }
-};
 
-export const signout = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const auth = req.headers.authorization;
-    if (!auth) return res.status(400).json({ error: 'No token provided' });
-    const parts = auth.split(' ');
-    if (parts.length !== 2 || parts[0] !== 'Bearer') return res.status(400).json({ error: 'Invalid authorization header' });
-    const token = parts[1];
+  const { accessToken, refreshToken } = await AuthService.authenticateUser(parsed.data as any);
+  res.cookie('refreshToken', refreshToken, getRefreshCookieOptions());
+  res.json({ accessToken });
+});
 
-    const decoded = jwt.decode(token) as any;
-    const exp = decoded?.exp ? new Date(decoded.exp * 1000) : new Date(Date.now() + 60 * 60 * 1000);
+export const signout = asyncHandler(async (req: Request, res: Response) => {
+  const auth = req.headers.authorization;
+  if (!auth) return res.status(400).json({ error: 'No token provided' });
 
-    await RevokedTokenModel.create({ token, expiresAt: exp });
-    const raw = (req as any).cookies?.refreshToken;
-    if (raw) {
-      await authService.revokeRefreshToken(raw);
-      const cookieOptions = getRefreshCookieOptions();
-      res.clearCookie('refreshToken', cookieOptions);
-    }
-    res.status(200).json({ ok: true });
-  } catch (err) {
-    console.error('signout error', err);
-    res.status(500).json({ error: 'Unable to complete request' });
+  const parts = auth.split(' ');
+  if (parts.length !== 2 || parts[0] !== 'Bearer') {
+    return res.status(400).json({ error: 'Invalid authorization header' });
   }
-};
 
-export const me = async (req: AuthRequest, res: Response) => {
-  const payload = req.user;
-  res.json({ user: payload });
-};
+  const token = parts[1];
+  const decoded = jwt.decode(token) as any;
+  const exp = decoded?.exp ? new Date(decoded.exp * 1000) : new Date(Date.now() + 60 * 60 * 1000);
+  await RevokedTokenModel.create({ token, expiresAt: exp });
 
-export const refresh = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const raw = (req as any).cookies?.refreshToken;
-    if (!raw) return res.status(401).json({ message: 'Unauthenticated' });
-    const doc = await authService.verifyRefreshToken(raw);
-    if (!doc) return res.status(401).json({ message: 'Invalid refresh token' });
-    const user = await UserModel.findById(doc.userId);
-    if (!user) return res.status(401).json({ message: 'Invalid refresh token' });
-    const newRaw = await authService.rotateRefreshToken(raw, doc.userId.toString());
-    if (!newRaw) return res.status(401).json({ message: 'Invalid refresh token' });
-    const secret = process.env.JWT_SECRET as string;
-    const expiresIn = process.env.JWT_EXPIRES_IN || '1h';
-    const accessToken = jwt.sign({ sub: user._id.toString(), email: user.email }, secret as any, { expiresIn: expiresIn as any });
-    const cookieOptions = getRefreshCookieOptions();
-    res.cookie('refreshToken', newRaw, cookieOptions);
-    res.json({ accessToken });
-  } catch (err) {
-    next(err);
+  const refreshToken = (req as any).cookies?.refreshToken;
+  if (refreshToken) {
+    await TokenService.revokeRefreshToken(refreshToken);
+    res.clearCookie('refreshToken', getRefreshCookieOptions());
   }
-};
 
-export const googleAuth = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const clientId = process.env.GOOGLE_CLIENT_ID;
-    const callback = process.env.GOOGLE_CALLBACK_URL;
-    if (!clientId || !callback) return res.status(500).json({ error: 'Google OAuth not configured' });
-    const returnTo = (req.query.returnTo as string) || '/';
-    const url = oauthService.buildGoogleAuthUrl({ clientId, callbackUrl: callback, clientSecret: '' }, returnTo);
-    res.redirect(url);
-  } catch (err) {
-    next(err);
+  res.status(200).json({ ok: true });
+});
+
+export const refresh = asyncHandler(async (req: Request, res: Response) => {
+  const rawToken = (req as any).cookies?.refreshToken;
+  if (!rawToken) return res.status(401).json({ message: 'Unauthenticated' });
+
+  const doc = await TokenService.verifyRefreshToken(rawToken);
+  if (!doc) return res.status(401).json({ message: 'Invalid refresh token' });
+
+  const user = await UserService.findUserById(doc.userId.toString());
+  if (!user) return res.status(401).json({ message: 'User not found' });
+
+  const newRefreshToken = await TokenService.rotateRefreshToken(rawToken, user._id.toString());
+  if (!newRefreshToken) return res.status(401).json({ message: 'Invalid refresh token state' });
+
+  const accessToken = generateAccessToken(user._id.toString(), user.email);
+  res.cookie('refreshToken', newRefreshToken, getRefreshCookieOptions());
+  res.json({ accessToken });
+});
+
+export const me = asyncHandler(async (req: AuthRequest, res: Response) => {
+  res.json({ user: req.user });
+});
+
+export const googleAuth = asyncHandler(async (req: Request, res: Response) => {
+  const clientId = process.env.GOOGLE_CLIENT_ID!;
+  const callback = process.env.GOOGLE_CALLBACK_URL!;
+  const returnTo = (req.query.returnTo as string) || '/';
+
+  const url = oauthService.buildGoogleAuthUrl({ clientId, callbackUrl: callback, clientSecret: '' }, returnTo);
+  res.redirect(url);
+});
+
+export const googleCallback = asyncHandler(async (req: Request, res: Response) => {
+  const code = req.query.code as string | undefined;
+  if (!code) return res.status(400).json({ error: 'Missing code' });
+
+  const state = req.query.state as string | undefined;
+  const frontend = normalizeFrontendBaseUrl(process.env.FRONTEND_URL, 'http://localhost:3000');
+
+  const tokenData = await oauthService.exchangeGoogleCode(
+    {
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      callbackUrl: process.env.GOOGLE_CALLBACK_URL!,
+    },
+    code
+  );
+
+  const decoded = jwt.decode(tokenData.id_token) as any;
+  const user = await UserService.findOrCreateUserByGoogle(decoded?.email, decoded?.name);
+  const tokens = await AuthService.createTokensForUser(user);
+
+  res.cookie('refreshToken', tokens.refreshToken, getRefreshCookieOptions());
+
+  const { returnTo } = oauthService.parseState(state);
+  res.redirect(`${frontend}${normalizeReturnToPath(returnTo)}`);
+});
+
+export const githubAuth = asyncHandler(async (req: Request, res: Response) => {
+  const clientId = process.env.GITHUB_CLIENT_ID!;
+  const callback = process.env.GITHUB_CALLBACK_URL!;
+  const returnTo = (req.query.returnTo as string) || '/';
+
+  const url = oauthService.buildGithubAuthUrl({ clientId, callbackUrl: callback, clientSecret: '' }, returnTo);
+  res.redirect(url);
+});
+
+export const githubCallback = asyncHandler(async (req: Request, res: Response) => {
+  const code = req.query.code as string | undefined;
+  if (!code) return res.status(400).json({ error: 'Missing code' });
+
+  const state = req.query.state as string | undefined;
+  const frontend = normalizeFrontendBaseUrl(process.env.FRONTEND_URL, 'http://localhost:3000');
+
+  const tokenData = await oauthService.exchangeGithubCode(
+    {
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+      callbackUrl: process.env.GITHUB_CALLBACK_URL!,
+    },
+    code
+  );
+
+  let email = await githubService.getUserPrimaryEmail(tokenData.access_token);
+  const userInfo = await githubService.getUserInfo(tokenData.access_token);
+
+  if (!email) email = userInfo.email;
+  if (!email) throw new Error('No email found for GitHub user');
+
+  const user = await UserService.findOrCreateUserByGithub(
+    email,
+    userInfo.name || userInfo.login,
+    String(userInfo.id),
+    userInfo.login,
+    tokenData.access_token
+  );
+
+  const tokens = await AuthService.createTokensForUser(user);
+  res.cookie('refreshToken', tokens.refreshToken, getRefreshCookieOptions());
+
+  const { returnTo } = oauthService.parseState(state);
+  res.redirect(`${frontend}${normalizeReturnToPath(returnTo)}`);
+});
+
+export const getGithubRepos = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const user = await UserService.findUserById(req.user.sub);
+  if (!user || !user.githubAccessToken) return res.json([]);
+
+  const repos = await githubService.getUserRepos(user.githubAccessToken);
+  res.json(repos);
+});
+
+export const getGithubCollaborators = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const user = await UserService.findUserById(req.user.sub);
+  if (!user || !user.githubAccessToken) {
+    return res.status(400).json({ error: 'No GitHub access token' });
   }
-};
 
-export const googleCallback = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const code = req.query.code as string | undefined;
-    const state = req.query.state as string | undefined;
-    const clientId = process.env.GOOGLE_CLIENT_ID as string;
-    const clientSecret = process.env.GOOGLE_CLIENT_SECRET as string;
-    const callback = process.env.GOOGLE_CALLBACK_URL as string;
-    const frontend = normalizeFrontendBaseUrl(process.env.FRONTEND_URL, 'http://localhost:3000');
-
-    if (!code) return res.status(400).json({ error: 'Missing code' });
-
-    const tokenJson = await oauthService.exchangeGoogleCode(
-      { clientId, clientSecret, callbackUrl: callback },
-      code
-    );
-
-    const idToken = tokenJson.id_token as string | undefined;
-    if (!idToken) return res.status(400).json({ error: 'Unable to verify google identity' });
-
-    const decoded = require('jsonwebtoken').decode(idToken) as any;
-    const email = decoded?.email;
-    const name = decoded?.name;
-    if (!email) return res.status(400).json({ error: 'No email returned from Google' });
-
-    const user = await authService.findOrCreateUserByGoogle(email, name);
-    const tokens = await authService.createTokensForUser(user as any);
-
-    const cookieOptions = getRefreshCookieOptions();
-    res.cookie('refreshToken', tokens.refreshToken, cookieOptions);
-
-    const { returnTo } = oauthService.parseState(state);
-    res.redirect(`${frontend}${normalizeReturnToPath(returnTo)}`);
-  } catch (err) {
-    next(err);
+  const { owner, repo } = req.params;
+  const ownerStr = Array.isArray(owner) ? owner[0] : owner;
+  const repoStr = Array.isArray(repo) ? repo[0] : repo;
+  if (!ownerStr || !repoStr) {
+    return res.status(400).json({ error: 'Missing owner or repo parameter' });
   }
-};
 
-export const githubAuth = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const clientId = process.env.GITHUB_CLIENT_ID;
-    const callback = process.env.GITHUB_CALLBACK_URL;
-    if (!clientId || !callback) return res.status(500).json({ error: 'GitHub OAuth not configured' });
-    const returnTo = (req.query.returnTo as string) || '/';
-    const url = oauthService.buildGithubAuthUrl({ clientId, callbackUrl: callback, clientSecret: '' }, returnTo);
-    res.redirect(url);
-  } catch (err) {
-    next(err);
-  }
-};
-
-export const githubCallback = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const code = req.query.code as string | undefined;
-    const state = req.query.state as string | undefined;
-    const clientId = process.env.GITHUB_CLIENT_ID as string;
-    const clientSecret = process.env.GITHUB_CLIENT_SECRET as string;
-    const callback = process.env.GITHUB_CALLBACK_URL as string;
-    const frontend = normalizeFrontendBaseUrl(process.env.FRONTEND_URL, 'http://localhost:3000');
-
-    if (!code) return res.status(400).json({ error: 'Missing code' });
-
-    const tokenJson = await oauthService.exchangeGithubCode(
-      { clientId, clientSecret, callbackUrl: callback },
-      code
-    );
-
-    const accessToken = tokenJson.access_token as string | undefined;
-    if (!accessToken) return res.status(400).json({ error: 'Unable to obtain access token from GitHub' });
-
-    const userJson = await githubService.getUserInfo(accessToken);
-    const email = userJson?.email as string | undefined;
-    const name = userJson?.name || userJson?.login;
-    const githubId = userJson?.id ? String(userJson.id) : undefined;
-    const githubUsername = userJson?.login;
-
-    let primaryEmail = email;
-    if (!primaryEmail) {
-      primaryEmail = await githubService.getUserPrimaryEmail(accessToken);
-    }
-
-    const user = await authService.findOrCreateUserByGithub(primaryEmail, name, githubId, githubUsername, accessToken);
-    const tokens = await authService.createTokensForUser(user as any);
-
-    const cookieOptions = getRefreshCookieOptions();
-    res.cookie('refreshToken', tokens.refreshToken, cookieOptions);
-
-    const { returnTo } = oauthService.parseState(state);
-    res.redirect(`${frontend}${normalizeReturnToPath(returnTo)}`);
-  } catch (err) {
-    next(err);
-  }
-};
-
-export const getGithubRepos = async (req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    const payload = req.user as any;
-    if (!payload?.sub) return res.status(401).json({ error: 'Unauthorized' });
-    const user = await UserModel.findById(payload.sub);
-    if (!user) return res.status(404).json({ error: 'User not found' });
-    const token = (user as any).githubAccessToken;
-    if (!token) return res.json([]);
-
-    const repos = await githubService.getUserRepos(token);
-    res.json(repos);
-  } catch (err) {
-    next(err);
-  }
-};
-
-export const getGithubCollaborators = async (req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    const payload = req.user as any;
-    if (!payload?.sub) return res.status(401).json({ error: 'Unauthorized' });
-    const user = await UserModel.findById(payload.sub);
-    if (!user) return res.status(404).json({ error: 'User not found' });
-    const token = (user as any).githubAccessToken;
-    if (!token) return res.status(400).json({ error: 'No GitHub access token available' });
-
-    const { owner, repo } = req.params;
-    const ownerStr = Array.isArray(owner) ? owner[0] : owner;
-    const repoStr = Array.isArray(repo) ? repo[0] : repo;
-    
-    if (!ownerStr || !repoStr) return res.status(400).json({ error: 'Missing owner or repo parameter' });
-
-    const collaborators = await githubService.getRepoCollaboratorsOrContributors(token, ownerStr, repoStr);
-    res.json(collaborators);
-  } catch (err) {
-    next(err);
-  }
-};
+  const collaborators = await githubService.getRepoCollaboratorsOrContributors(
+    user.githubAccessToken,
+    ownerStr,
+    repoStr
+  );
+  res.json(collaborators);
+});

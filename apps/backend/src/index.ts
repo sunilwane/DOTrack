@@ -1,13 +1,12 @@
+import 'dotenv/config';
 import express from 'express';
 import connectDB from './config/db';
-import dotenv from 'dotenv';
 import registerRoutes from './routes/index';
 import { errorHandler } from './middlewares/errorHandler';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { normalizeOrigin, parseAllowedOrigins } from './utils/origin';
 
-dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 

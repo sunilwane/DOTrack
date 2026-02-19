@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import Dashboard from "../pages/Dashboard/Dashboard";
+import MainDashboard from "../pages/Dashboard/MainDashboard";
 import Projects from "../pages/Projects/Projects";
 import Deployments from "../pages/Deployments/Deployments";
 import Landing from "../pages/Landing/Landing";
@@ -34,6 +35,7 @@ export const AppRouter = () => {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/main-dashboard" element={<MainDashboard />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/all-projects" element={<AllProjects />} />
           <Route path="/register-project" element={<RegisterProject />} />
