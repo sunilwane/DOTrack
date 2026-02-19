@@ -1,9 +1,11 @@
 import * as React from "react";
+import { usePageLoading } from "../../hooks/usePageLoading";
 import { Button } from "../../Components/common/Button";
 import Pagination from "../../Components/common/Pagination";
 import StatsGrid from "../../Components/common/StatsGrid";
 import AuditTable from "../../Components/common/TableComp";
 import { AuditStats, AuditLogsData } from "../../mock/PagesMockData/AuditData";
+import { Skeleton } from "../../Components/Skeleton";
 
 import { Rocket, Shield, Database } from "lucide-react";
 
@@ -14,6 +16,8 @@ const iconMap = {
 };
 
 const AuditDashboard: React.FC = () => {
+    const { isLoading: isSimulatingLoad } = usePageLoading('audit_logs');
+
     const statsWithIcons = AuditStats.map(stat => ({
         ...stat,
         icon: iconMap[stat.category]
@@ -31,20 +35,23 @@ const AuditDashboard: React.FC = () => {
                     </p>
                 </div>
 
-                <StatsGrid stats={statsWithIcons} />
+                <StatsGrid stats={statsWithIcons} isLoading={isSimulatingLoad} />
 
                 <div className="flex justify-end">
-                    <Button variant="primary">
-                        Verify All Records
-                    </Button>
+                    <Skeleton isLoaded={!isSimulatingLoad} width="160px" height="40px" className="rounded-lg">
+                        <Button variant="primary">
+                            Verify All Records
+                        </Button>
+                    </Skeleton>
                 </div>
 
-                <AuditTable title="On-Chain Deployment Proofs" data={AuditLogsData} />
+                <AuditTable title="On-Chain Deployment Proofs" data={AuditLogsData} isLoading={isSimulatingLoad} />
 
                 <Pagination
                     totalItems={1248}
                     itemsPerPage={25}
                     currentPage={1}
+                    isLoading={isSimulatingLoad}
                 />
             </div>
         </div>

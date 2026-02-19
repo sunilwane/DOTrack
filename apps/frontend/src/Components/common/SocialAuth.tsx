@@ -1,15 +1,13 @@
 import * as React from "react";
 import { Button } from "../common/Button";
 import { GitHubIcon, GoogleIcon } from "../icons";
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+import { oauthService } from "../../services/oauthService";
 
 export const SocialAuth: React.FC = () => {
   const returnTo =
     typeof window !== "undefined" ? window.location.pathname : "/";
-  const googleHref = `${API_BASE_URL}/api/auth/google?returnTo=${encodeURIComponent(returnTo)}`;
-  const githubHref = `${API_BASE_URL}/api/auth/github?returnTo=${encodeURIComponent(returnTo)}`;
+  const googleHref = oauthService.getGoogleAuthUrl(returnTo);
+  const githubHref = oauthService.getGithubAuthUrl(returnTo);
   return (
          <div className="flex flex-col gap-3 mb-8">
             <a href={githubHref} className="block">

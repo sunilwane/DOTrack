@@ -1,7 +1,6 @@
-import { IUser } from '../models/user.model';
+import { requestJson, requestJsonOrNull } from './httpService';
 
-
-interface GitHubRepo {
+export interface GitHubRepo {
   id: number;
   name: string;
   full_name: string;
@@ -15,144 +14,123 @@ interface GitHubRepo {
   open_issues_count: number;
 }
 
-interface GitHubCollaborator {
+export interface GitHubUser {
+  login: string;
+  id: number;
+  avatar_url: string;
+  html_url: string;
+  name?: string;
+  email?: string;
+}
+
+export interface GitHubCollaborator {
   login: string;
   id: number;
   avatar_url: string;
   html_url: string;
 }
 
+type GitHubEmail = {
+  email?: string;
+  primary?: boolean;
+};
+
 export class GitHubService {
   private readonly baseUrl = 'https://api.github.com';
 
-  
-  async getUserRepos(accessToken: string): Promise<GitHubRepo[]> {
-    const response = await fetch(`${this.baseUrl}/user/repos?per_page=100`, {
-      headers: {
-        Authorization: `token ${accessToken}`,
-        Accept: 'application/vnd.github.v3+json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch repos: ${response.statusText}`);
-    }
-
-    return await response.json();
+  private buildHeaders(accessToken: string): HeadersInit {
+    return {
+      Authorization: `token ${accessToken}`,
+      Accept: 'application/vnd.github.v3+json',
+    };
   }
 
-  
+  private mapUsersToCollaborators(users: GitHubUser[] = []): GitHubCollaborator[] {
+    return users.map((user) => ({
+      login: user.login,
+      id: user.id,
+      avatar_url: user.avatar_url,
+      html_url: user.html_url,
+    }));
+  }
+
+  async getUserRepos(accessToken: string): Promise<GitHubRepo[]> {
+    return requestJson<GitHubRepo[]>(
+      `${this.baseUrl}/user/repos?per_page=100`,
+      {
+        headers: this.buildHeaders(accessToken),
+      },
+      'Failed to fetch GitHub repositories'
+    );
+  }
+
   async getRepoCollaborators(
     accessToken: string,
     owner: string,
     repo: string
   ): Promise<GitHubCollaborator[]> {
-    const response = await fetch(
+    const users = await requestJsonOrNull<GitHubUser[]>(
       `${this.baseUrl}/repos/${owner}/${repo}/collaborators?per_page=20`,
       {
-        headers: {
-          Authorization: `token ${accessToken}`,
-          Accept: 'application/vnd.github.v3+json',
-        },
+        headers: this.buildHeaders(accessToken),
       }
     );
 
-    if (response.ok) {
-      const data = await response.json();
-      if (Array.isArray(data) && data.length > 0) {
-        return data.map((c: any) => ({
-          login: c.login,
-          id: c.id,
-          avatar_url: c.avatar_url,
-          html_url: c.html_url,
-        }));
-      }
-    }
-
-    return [];
+    if (!Array.isArray(users)) return [];
+    return this.mapUsersToCollaborators(users);
   }
 
-  
   async getRepoContributors(
     accessToken: string,
     owner: string,
     repo: string
   ): Promise<GitHubCollaborator[]> {
-    const response = await fetch(
+    const users = await requestJsonOrNull<GitHubUser[]>(
       `${this.baseUrl}/repos/${owner}/${repo}/contributors?per_page=20`,
       {
-        headers: {
-          Authorization: `token ${accessToken}`,
-          Accept: 'application/vnd.github.v3+json',
-        },
+        headers: this.buildHeaders(accessToken),
       }
     );
 
-    if (!response.ok) {
-      return [];
-    }
-
-    const data = await response.json();
-    return data.map((c: any) => ({
-      login: c.login,
-      id: c.id,
-      avatar_url: c.avatar_url,
-      html_url: c.html_url,
-    }));
+    if (!Array.isArray(users)) return [];
+    return this.mapUsersToCollaborators(users);
   }
-
 
   async getRepoCollaboratorsOrContributors(
     accessToken: string,
     owner: string,
     repo: string
   ): Promise<GitHubCollaborator[]> {
-    
     const collaborators = await this.getRepoCollaborators(accessToken, owner, repo);
     if (collaborators.length > 0) {
       return collaborators;
     }
 
-   
-    return await this.getRepoContributors(accessToken, owner, repo);
+    return this.getRepoContributors(accessToken, owner, repo);
   }
 
-  
-  async getUserInfo(accessToken: string): Promise<any> {
-    const response = await fetch(`${this.baseUrl}/user`, {
-      headers: {
-        Authorization: `token ${accessToken}`,
-        Accept: 'application/vnd.github.v3+json',
+  async getUserInfo(accessToken: string): Promise<GitHubUser> {
+    return requestJson<GitHubUser>(
+      `${this.baseUrl}/user`,
+      {
+        headers: this.buildHeaders(accessToken),
       },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch GitHub user info');
-    }
-
-    return await response.json();
+      'Failed to fetch GitHub user info'
+    );
   }
 
-  
   async getUserPrimaryEmail(accessToken: string): Promise<string | undefined> {
-    const response = await fetch(`${this.baseUrl}/user/emails`, {
-      headers: {
-        Authorization: `token ${accessToken}`,
-        Accept: 'application/vnd.github.v3+json',
-      },
-    });
+    const emails = await requestJsonOrNull<GitHubEmail[]>(
+      `${this.baseUrl}/user/emails`,
+      {
+        headers: this.buildHeaders(accessToken),
+      }
+    );
 
-    if (!response.ok) {
-      return undefined;
-    }
+    if (!Array.isArray(emails) || emails.length === 0) return undefined;
 
-    const emails = await response.json();
-    if (Array.isArray(emails)) {
-      const primary = emails.find((e: any) => e.primary) || emails[0];
-      return primary?.email;
-    }
-
-    return undefined;
+    const primary = emails.find((entry) => entry.primary) || emails[0];
+    return primary?.email;
   }
 }
 

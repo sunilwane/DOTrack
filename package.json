@@ -15,10 +15,14 @@
   "packageManager": "pnpm@10.13.1",
   "dependencies": {
     "@heroui/react": "^2.8.8",
+    "@heroui/skeleton": "^2.2.18",
+    "@heroui/system": "^2.4.27",
+    "@heroui/theme": "^2.4.26",
     "@nextui-org/react": "^2.6.11",
     "framer-motion": "^12.31.0",
     "lucide-react": "^0.563.0",
     "material-symbols": "^0.40.2",
-    "react-icons": "^5.5.0"
+    "react-icons": "^5.5.0",
+    "tailwindcss": "^4.0.0"
   }
 }

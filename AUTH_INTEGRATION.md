@@ -157,7 +157,7 @@ All routes under `<ProtectedRoute>` in the router:
 - Verify MongoDB connection
 
 ### "Failed to fetch" errors
-- Ensure backend is running on `http://localhost:5000`
+- Ensure backend is running on `https://backend-production-0dbd.up.railway.app`
 - Ensure frontend is running on `http://localhost:3000`
 - Check browser console for CORS errors
 
@@ -273,7 +273,7 @@ Optional enhancements you could add:
 - **GitHub OAuth App setup (quick guide)**
    1. In GitHub, go to Settings → Developer settings → OAuth Apps → New OAuth App.
    2. Set the **Homepage URL** to your frontend `FRONTEND_URL` (e.g., `http://localhost:3000`).
-   3. Set the **Authorization callback URL** to your backend `GITHUB_CALLBACK_URL` (e.g., `http://localhost:5000/api/auth/github/callback`).
+   3. Set the **Authorization callback URL** to your backend `GITHUB_CALLBACK_URL` (e.g., `https://backend-production-0dbd.up.railway.app/api/auth/github/callback`).
    4. Create the app and copy `Client ID` and `Client Secret` into your environment variables (`GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`).
 
 - **Testing the flow locally**

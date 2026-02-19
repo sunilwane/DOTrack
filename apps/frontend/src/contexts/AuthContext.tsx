@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { authService } from '../services/authService';
 import type { SignInData, SignUpData } from '../services/authService';
+import { tokenStorage } from '../services/tokenStorage';
 
 interface User {
   sub: string;
@@ -53,7 +54,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setUser(userData);
           } catch (refreshError) {
             console.error('Failed to refresh token:', refreshError);
-            localStorage.removeItem('accessToken');
+            tokenStorage.clear();
             setUser(null);
           }
         }
@@ -87,8 +88,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signup = async (data: SignUpData) => {
     try {
       await authService.signup(data);
-      const { user: userData } = await authService.getMe();
-      setUser(userData);
     } catch (error) {
       console.error('Signup error:', error);
       throw error;

@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import Dashboard from "../pages/Dashboard/Dashboard";
+import MainDashboard from "../pages/Dashboard/MainDashboard";
 import Projects from "../pages/Projects/Projects";
 import Deployments from "../pages/Deployments/Deployments";
 import Landing from "../pages/Landing/Landing";
@@ -14,6 +15,7 @@ import RegisterProject from "../pages/RegisterProject/RegisterProject";
 import VersionHistory from "../pages/VersionHistory/VersionHistory";
 import MarketPlace from "../pages/Marketplace/Marketplace";
 import Blockchain from "../pages/Blockchain/Blockchain";
+import ProjectViewer from "../pages/Projects/ProjectViewer";
 import DeployeReq from "../pages/Projects/DeployeReq";
 import { AppLayout } from "../Components/layout/AppLayout";
 import { ProtectedRoute } from "../Components/ProtectedRoute";
@@ -33,11 +35,13 @@ export const AppRouter = () => {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/main-dashboard" element={<MainDashboard />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/all-projects" element={<AllProjects />} />
           <Route path="/register-project" element={<RegisterProject />} />
           <Route path="/deployments" element={<Deployments />} />
           <Route path="/marketplace" element={<MarketPlace />} />
+          <Route path="/projects/:owner/:repo" element={<ProjectViewer />} />
           <Route path="/pipelines" element={<Pipeline />} />
           <Route path="/ipfs-templates" element={<Pipeline />} />
           <Route path="/audit-logs" element={<AuditDashboard />} />
