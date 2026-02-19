@@ -2,10 +2,12 @@ import { comparePassword, hashPassword } from '../utils/hash';
 import * as UserService from './user.service';
 import * as TokenService from './token.service';
 import { generateAccessToken } from '../utils/jwt.util';
-import UserModel from '../models/user.model'; // Need for direct query in authenticateUser if not in UserService, but UserService has findUserByEmail
+import UserModel from '../models/user.model';
+import RevokedTokenModel from '../models/revokedToken.model';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 
 const SALT_ROUNDS = 12;
-import bcrypt from 'bcrypt';
 const DUMMY_HASH = bcrypt.hashSync('invalid-password-placeholder', SALT_ROUNDS);
 
 export const createUser = async (payload: { email?: string; password?: string; name?: string }) => {
@@ -60,6 +62,18 @@ export const findOrCreateUserByGithub = async (
 ) => {
   if (!email) throw new Error('Email required');
   return await UserService.findOrCreateUserByGithub(email, name, githubId, githubUsername, githubAccessToken);
+};
+
+export const revokeBearerToken = async (authHeader: string) => {
+  const parts = authHeader.split(' ');
+  if (parts.length !== 2 || parts[0] !== 'Bearer') {
+    throw new Error('Invalid authorization header');
+  }
+
+  const token = parts[1];
+  const decoded = jwt.decode(token) as any;
+  const exp = decoded?.exp ? new Date(decoded.exp * 1000) : new Date(Date.now() + 60 * 60 * 1000);
+  await RevokedTokenModel.create({ token, expiresAt: exp });
 };
 
 export const createTokensForUser = async (user: any) => {
