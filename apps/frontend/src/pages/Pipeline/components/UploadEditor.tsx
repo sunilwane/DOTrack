@@ -1,5 +1,5 @@
 import { CodeEditor } from '../../../Components/common/CodeEditor';
-import type { FileUploadState } from '../Pipeline';
+import type { FileUploadState } from '../types';
 import { Skeleton } from '../../../Components/Skeleton';
 
 interface Props {
@@ -67,7 +67,7 @@ const UploadEditor: React.FC<Props> = ({
                         </div>
                         <div>
                             <p className="font-bold text-slate-900 dark:text-white">{uploadState.file.name}</p>
-                            <p className="text-xs text-slate-500">{(uploadState.file.size / 1024).toFixed(2)} KB • {uploadState.language?.toUpperCase()}</p>
+                            <p className="text-xs text-slate-500">{(uploadState.file.size / 1024).toFixed(2)} KB | {uploadState.language?.toUpperCase()}</p>
                         </div>
                     </div>
                     <button onClick={onClearFile} className="p-2 text-slate-400 hover:text-red-500 transition-colors h-10 w-10 flex items-center justify-center rounded-full">

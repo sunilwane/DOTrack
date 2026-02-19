@@ -1,6 +1,7 @@
 import { apiRequest } from './apiClient';
 import { apiPaths } from './apiPaths';
 import { tokenStorage } from './tokenStorage';
+import { logger } from '../utils/logger';
 
 export interface SignUpData {
   name: string;
@@ -60,8 +61,9 @@ class AuthService {
         method: 'POST',
         auth: true,
       });
+      logger.info('User signed out successfully');
     } catch (error) {
-      console.warn('Signout request failed, but clearing local data', error);
+      logger.warn('Signout request failed, but clearing local data', undefined, error instanceof Error ? error : undefined);
     } finally {
       tokenStorage.clear();
     }

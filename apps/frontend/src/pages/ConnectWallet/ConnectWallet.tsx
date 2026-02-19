@@ -2,10 +2,11 @@ import * as React from "react";
 import { AuthLayout } from "../../Components/layout/AuthLayout";
 import { WalletOptionCard } from "./WalletOptionCard";
 import { WalletOptions } from "../../mock/PagesMockData/WalletData";
+import { useToggle } from "../../hooks";
 
 const ConnectWallet: React.FC = () => {
-    const isConnected = false; 
-    const isPolygonMainnet = false; 
+    const [isConnected] = useToggle(false);
+    const [isPolygonMainnet] = useToggle(false); 
 
     return (
        
