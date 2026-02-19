@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
 import { asyncHandler } from '../utils/asyncHandler';
 import { signupSchema, signinSchema } from '../utils/validators';
 import { getRefreshCookieOptions } from '../utils/cookies';
@@ -9,9 +8,8 @@ import * as UserService from '../services/user.service';
 import * as TokenService from '../services/token.service';
 import { githubService } from '../services/githubService';
 import { oauthService } from '../services/oauthService';
-import RevokedTokenModel from '../models/revokedToken.model';
-import { generateAccessToken } from '../utils/jwt.util';
 import { normalizeFrontendBaseUrl, normalizeReturnToPath } from '../utils/origin';
+import jwt from 'jsonwebtoken';
 
 export const signup = asyncHandler(async (req: Request, res: Response) => {
   const parsed = signupSchema.safeParse(req.body);
@@ -36,21 +34,13 @@ export const signin = asyncHandler(async (req: Request, res: Response) => {
 
 export const signout = asyncHandler(async (req: Request, res: Response) => {
   const auth = req.headers.authorization;
-  if (!auth) return res.status(400).json({ error: 'No token provided' });
-
-  const parts = auth.split(' ');
-  if (parts.length !== 2 || parts[0] !== 'Bearer') {
-    return res.status(400).json({ error: 'Invalid authorization header' });
+  if (auth) {
+    await AuthService.revokeBearerToken(auth);
   }
-
-  const token = parts[1];
-  const decoded = jwt.decode(token) as any;
-  const exp = decoded?.exp ? new Date(decoded.exp * 1000) : new Date(Date.now() + 60 * 60 * 1000);
-  await RevokedTokenModel.create({ token, expiresAt: exp });
 
   const refreshToken = (req as any).cookies?.refreshToken;
   if (refreshToken) {
-    await TokenService.revokeRefreshToken(refreshToken);
+    await AuthService.revokeRefreshToken(refreshToken);
     res.clearCookie('refreshToken', getRefreshCookieOptions());
   }
 
@@ -61,18 +51,19 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
   const rawToken = (req as any).cookies?.refreshToken;
   if (!rawToken) return res.status(401).json({ message: 'Unauthenticated' });
 
-  const doc = await TokenService.verifyRefreshToken(rawToken);
+  const doc = await AuthService.verifyRefreshToken(rawToken);
   if (!doc) return res.status(401).json({ message: 'Invalid refresh token' });
 
   const user = await UserService.findUserById(doc.userId.toString());
   if (!user) return res.status(401).json({ message: 'User not found' });
 
-  const newRefreshToken = await TokenService.rotateRefreshToken(rawToken, user._id.toString());
+  const newRefreshToken = await AuthService.rotateRefreshToken(rawToken, user._id.toString());
   if (!newRefreshToken) return res.status(401).json({ message: 'Invalid refresh token state' });
 
-  const accessToken = generateAccessToken(user._id.toString(), user.email);
-  res.cookie('refreshToken', newRefreshToken, getRefreshCookieOptions());
-  res.json({ accessToken });
+  const tokens = await AuthService.createTokensForUser(user);
+
+  res.cookie('refreshToken', tokens.refreshToken, getRefreshCookieOptions());
+  res.json({ accessToken: tokens.accessToken });
 });
 
 export const me = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -105,7 +96,7 @@ export const googleCallback = asyncHandler(async (req: Request, res: Response) =
   );
 
   const decoded = jwt.decode(tokenData.id_token) as any;
-  const user = await UserService.findOrCreateUserByGoogle(decoded?.email, decoded?.name);
+  const user = await AuthService.findOrCreateUserByGoogle(decoded?.email, decoded?.name);
   const tokens = await AuthService.createTokensForUser(user);
 
   res.cookie('refreshToken', tokens.refreshToken, getRefreshCookieOptions());
@@ -145,7 +136,7 @@ export const githubCallback = asyncHandler(async (req: Request, res: Response) =
   if (!email) email = userInfo.email;
   if (!email) throw new Error('No email found for GitHub user');
 
-  const user = await UserService.findOrCreateUserByGithub(
+  const user = await AuthService.findOrCreateUserByGithub(
     email,
     userInfo.name || userInfo.login,
     String(userInfo.id),
@@ -188,3 +179,5 @@ export const getGithubCollaborators = asyncHandler(async (req: AuthRequest, res:
   );
   res.json(collaborators);
 });
+
+export default { signup, signin, signout, refresh, me, googleAuth, googleCallback, githubAuth, githubCallback, getGithubRepos, getGithubCollaborators };

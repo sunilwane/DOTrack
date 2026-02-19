@@ -35,6 +35,30 @@ type GitHubEmail = {
   primary?: boolean;
 };
 
+export interface GitHubBranch {
+  name: string;
+  commit: {
+    sha: string;
+  };
+}
+
+export interface GitHubTreeEntry {
+  name: string;
+  path: string;
+  type: 'file' | 'dir';
+  size: number;
+  sha: string;
+}
+
+export interface GitHubFile {
+  name: string;
+  path: string;
+  sha: string;
+  size: number;
+  content: string | null;
+  encoding: string;
+}
+
 export class GitHubService {
   private readonly baseUrl = 'https://api.github.com';
 
@@ -131,6 +155,57 @@ export class GitHubService {
 
     const primary = emails.find((entry) => entry.primary) || emails[0];
     return primary?.email;
+  }
+
+  async getRepoBranches(accessToken: string, owner: string, repo: string): Promise<GitHubBranch[]> {
+    return requestJson<GitHubBranch[]>(
+      `${this.baseUrl}/repos/${owner}/${repo}/branches`,
+      { headers: this.buildHeaders(accessToken) },
+      'Failed to fetch branches'
+    );
+  }
+
+  async getRepoTree(
+    accessToken: string,
+    owner: string,
+    repo: string,
+    path: string = '',
+    ref: string = ''
+  ): Promise<GitHubTreeEntry[] | GitHubFile | null> {
+    const encodedPath = path ? `/${encodeURIComponent(path)}` : '';
+    const refQuery = ref ? `?ref=${encodeURIComponent(ref)}` : '';
+    const url = `${this.baseUrl}/repos/${owner}/${repo}/contents${encodedPath}${refQuery}`;
+
+    const result = await requestJson<any>(
+      url,
+      { headers: this.buildHeaders(accessToken) },
+      'Failed to fetch tree'
+    );
+
+    if (Array.isArray(result)) {
+      return result.map((e) => ({
+        name: e.name,
+        path: e.path,
+        type: e.type,
+        size: e.size,
+        sha: e.sha,
+      }));
+    }
+
+    if (result.type === 'file') {
+      return {
+        name: result.name,
+        path: result.path,
+        sha: result.sha,
+        size: result.size,
+        content: result.content
+          ? Buffer.from(result.content, result.encoding || 'base64').toString('utf8')
+          : null,
+        encoding: result.encoding,
+      };
+    }
+
+    return null;
   }
 }
 
