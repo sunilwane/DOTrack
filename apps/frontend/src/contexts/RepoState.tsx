@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer } from 'react';
+import React, { createContext, useReducer } from 'react';
 import type { ReactNode } from 'react';
 
 type TreeEntry = { name: string; path: string; type: string; size?: number; sha?: string };
@@ -66,10 +66,5 @@ export const RepoStateProvider = ({ children, initial }: { children: ReactNode; 
   return <RepoStateContext.Provider value={{ state, dispatch }}>{children}</RepoStateContext.Provider>;
 };
 
-export const useRepoState = () => {
-  const ctx = useContext(RepoStateContext);
-  if (!ctx) throw new Error('useRepoState must be used within RepoStateProvider');
-  return ctx;
-};
-
+export { RepoStateContext };
 export type { TreeEntry, FileData };

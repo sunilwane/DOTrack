@@ -1,76 +1,74 @@
-import { useEffect, useRef, useState } from "react";
-import type { PipelineStage } from "types";
+import { useEffect, useRef, useState } from 'react';
+import type { PipelineStage } from 'types';
+import {
+  ANIMATION_INTERVAL_MS,
+  ANIMATION_RESTART_DELAY_MS,
+} from './pipelineAnimation/constants';
+import {
+  markFinalStageComplete,
+  markPipelineStageActive,
+  markPipelineStageDone,
+  resetPipelineStages,
+} from './pipelineAnimation/stageTransforms';
 
 export function usePipelineAnimation(initialStages: PipelineStage[]) {
-    const [stages, setStages] = useState<PipelineStage[]>(initialStages);
-    const intervalRef = useRef<number | null>(null);
-    const restartTimeoutRef = useRef<number | null>(null);
+  const [stages, setStages] = useState<PipelineStage[]>(initialStages);
+  const intervalRef = useRef<number | null>(null);
+  const restartTimeoutRef = useRef<number | null>(null);
 
-    useEffect(() => {
-        let currentStageIndex = 0;
+  useEffect(() => {
+    let currentStageIndex = 0;
 
-        const runAnimation = () => {
-            setStages(prev => prev.map(s => ({
-                ...s,
-                status: "pending",
-                time: s.id === 5 ? "Queued" : "Pending",
-                icon: s.id === 3 ? "verified_user" : s.id === 4 ? "pen_size_2" : s.id === 5 ? "rocket_launch" : "check"
-            })));
-            currentStageIndex = 0;
+    const clearTimers = () => {
+      if (intervalRef.current) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      if (restartTimeoutRef.current) {
+        window.clearTimeout(restartTimeoutRef.current);
+        restartTimeoutRef.current = null;
+      }
+    };
 
-            intervalRef.current = window.setInterval(() => {
-                setStages(prev => {
-                    const newStages = [...prev];
+    const runAnimation = () => {
+      clearTimers();
+      setStages(resetPipelineStages(initialStages));
+      currentStageIndex = 0;
 
-                    if (currentStageIndex >= newStages.length) {
-                        if (currentStageIndex === newStages.length && newStages[currentStageIndex - 1]) {
-                            newStages[currentStageIndex - 1].status = "done";
-                            newStages[currentStageIndex - 1].time = "Complete";
-                            newStages[currentStageIndex - 1].icon = "check";
-                        }
-                        if (intervalRef.current) {
-                            window.clearInterval(intervalRef.current);
-                            intervalRef.current = null;
-                        }
-                        restartTimeoutRef.current = window.setTimeout(runAnimation, 3000) as unknown as number;
-                        return newStages;
-                    }
+      intervalRef.current = window.setInterval(() => {
+        setStages((previous) => {
+          if (currentStageIndex >= previous.length) {
+            if (intervalRef.current) {
+              window.clearInterval(intervalRef.current);
+              intervalRef.current = null;
+            }
+            restartTimeoutRef.current = window.setTimeout(
+              runAnimation,
+              ANIMATION_RESTART_DELAY_MS
+            ) as unknown as number;
 
-                    if (currentStageIndex > 0) {
-                        newStages[currentStageIndex - 1].status = "done";
-                        const timeAgo = ["2m ago", "1m ago", "45s ago", "30s ago"];
-                        newStages[currentStageIndex - 1].time = timeAgo[currentStageIndex - 1] || "Just now";
-                        newStages[currentStageIndex - 1].icon = "check";
-                        if (newStages[currentStageIndex - 1].id === 3) {
-                            newStages[currentStageIndex - 1].icon = "verified_user";
-                        }
-                    }
+            return currentStageIndex === previous.length && previous[currentStageIndex - 1]
+              ? markFinalStageComplete(previous, currentStageIndex - 1)
+              : previous;
+          }
 
-                    newStages[currentStageIndex].status = "active";
-                    if (currentStageIndex === 3) {
-                        newStages[currentStageIndex].time = "Pending Signature";
-                        newStages[currentStageIndex].icon = "pen_size_2";
-                    } else if (currentStageIndex === 4) {
-                        newStages[currentStageIndex].time = "Deploying...";
-                        newStages[currentStageIndex].icon = "rocket_launch";
-                    } else {
-                        newStages[currentStageIndex].time = "Running...";
-                        newStages[currentStageIndex].icon = "progress_activity";
-                    }
+          let nextStages = previous;
 
-                    currentStageIndex++;
-                    return newStages;
-                });
-            }, 2500) as unknown as number;
-        };
+          if (currentStageIndex > 0) {
+            nextStages = markPipelineStageDone(nextStages, currentStageIndex - 1);
+          }
 
-        runAnimation();
+          nextStages = markPipelineStageActive(nextStages, currentStageIndex);
+          currentStageIndex += 1;
+          return nextStages;
+        });
+      }, ANIMATION_INTERVAL_MS) as unknown as number;
+    };
 
-        return () => {
-            if (intervalRef.current) window.clearInterval(intervalRef.current);
-            if (restartTimeoutRef.current) window.clearTimeout(restartTimeoutRef.current);
-        };
-    }, [initialStages]);
+    runAnimation();
 
-    return stages;
+    return clearTimers;
+  }, [initialStages]);
+
+  return stages;
 }

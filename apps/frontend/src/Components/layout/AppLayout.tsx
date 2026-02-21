@@ -1,12 +1,11 @@
-import { useState } from "react";
-import { Outlet } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
+import { useToggle } from "../../hooks";
 import Sidebar from "../common/Sidebar";
 import Topbar from "../common/Topbar";
 import { Scroller } from "../common/Scroller";
 
 export const AppLayout = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, , , , setIsCollapsed] = useToggle(false);
   const location = useLocation();
   const isProjectViewerRoute = /^\/projects\/[^/]+\/[^/]+\/?$/.test(location.pathname);
 

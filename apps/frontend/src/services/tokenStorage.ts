@@ -1,16 +1,16 @@
-const ACCESS_TOKEN_KEY = 'accessToken';
+import { STORAGE_KEYS } from '../constants';
 
 class TokenStorage {
   get(): string | null {
-    return localStorage.getItem(ACCESS_TOKEN_KEY);
+    return localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
   }
 
   set(token: string): void {
-    localStorage.setItem(ACCESS_TOKEN_KEY, token);
+    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
   }
 
   clear(): void {
-    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
   }
 }
 
