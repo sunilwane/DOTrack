@@ -28,7 +28,7 @@ export const GasEstimateCard: React.FC<GasEstimateCardProps> = ({ estimate, esti
             </div>
             <div className="text-right">
                 <p className="text-primary text-xl font-bold">{estimate.eth}</p>
-                <p className="text-slate-500 dark:text-slate-400 text-xs">≈ {estimate.usd}</p>
+                <p className="text-slate-500 dark:text-slate-400 text-xs">~ {estimate.usd}</p>
             </div>
         </div>
         <div className="flex items-center gap-2 px-1">

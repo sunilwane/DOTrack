@@ -1,27 +1,18 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { ReactNode } from 'react';
-import { authService } from '../services/authService';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { SignInData, SignUpData } from '../services/authService';
-import { tokenStorage } from '../services/tokenStorage';
-
-interface User {
-  sub: string;
-  email: string;
-}
-
-interface AuthContextType {
-  user: User | null;
-  isLoading: boolean;
-  isAuthenticated: boolean;
-  signin: (data: SignInData) => Promise<void>;
-  signup: (data: SignUpData) => Promise<void>;
-  signout: () => Promise<void>;
-  refreshAuth: () => Promise<void>;
-}
+import { logger } from '../utils/logger';
+import {
+  initializeAuthUser,
+  refreshAndFetchCurrentUser,
+  signinAndFetchCurrentUser,
+  signoutUser,
+  signupUser,
+} from './auth/authOperations';
+import type { AuthContextType, AuthProviderProps } from './auth/types';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
- /*eslint-disable-next-line react-refresh/only-export-components */
+/*eslint-disable-next-line react-refresh/only-export-components */
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -30,43 +21,14 @@ export const useAuth = () => {
   return context;
 };
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthContextType['user']>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const initializeAuth = async () => {
-      const token = authService.getAccessToken();
-
-      if (token) {
-        try {
-          const { user: userData } = await authService.getMe();
-          setUser(userData);
-        } catch (error) {
-          console.error('Failed to fetch user:', error);
-          try {
-            await authService.refresh();
-            const { user: userData } = await authService.getMe();
-            setUser(userData);
-          } catch (refreshError) {
-            console.error('Failed to refresh token:', refreshError);
-            tokenStorage.clear();
-            setUser(null);
-          }
-        }
-      } else {
-        try {
-          await authService.refresh();
-          const { user: userData } = await authService.getMe();
-          setUser(userData);
-        } catch {
-          // No token available, user not authenticated yet
-        }
-      }
+      const initializedUser = await initializeAuthUser();
+      setUser(initializedUser);
 
       setIsLoading(false);
     };
@@ -76,29 +38,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signin = async (data: SignInData) => {
     try {
-      await authService.signin(data);
-      const { user: userData } = await authService.getMe();
+      const userData = await signinAndFetchCurrentUser(data);
       setUser(userData);
+      logger.info('User signed in successfully', { email: data.email });
     } catch (error) {
-      console.error('Signin error:', error);
+      logger.error('Signin failed', error instanceof Error ? error : undefined, { email: data.email });
       throw error;
     }
   };
 
   const signup = async (data: SignUpData) => {
     try {
-      await authService.signup(data);
+      await signupUser(data);
+      logger.info('User signed up successfully', { email: data.email });
     } catch (error) {
-      console.error('Signup error:', error);
+      logger.error('Signup failed', error instanceof Error ? error : undefined, { email: data.email });
       throw error;
     }
   };
 
   const signout = async () => {
     try {
-      await authService.signout();
+      await signoutUser();
+      logger.info('User signed out successfully');
     } catch (error) {
-      console.error('Signout error:', error);
+      logger.error('Signout failed', error instanceof Error ? error : undefined);
     } finally {
       setUser(null);
     }
@@ -106,11 +70,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const refreshAuth = async () => {
     try {
-      await authService.refresh();
-      const { user: userData } = await authService.getMe();
+      const userData = await refreshAndFetchCurrentUser();
       setUser(userData);
+      logger.debug('Auth token refreshed successfully');
     } catch (error) {
-      console.error('Refresh error:', error);
+      logger.error('Auth refresh failed', error instanceof Error ? error : undefined);
       setUser(null);
       throw error;
     }

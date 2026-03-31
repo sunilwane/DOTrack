@@ -10,7 +10,6 @@ import SignUp from "../pages/Login/SignUp";
 import ConnectWallet from "../pages/ConnectWallet/ConnectWallet";
 import AuditDashboard from "../pages/AuditLogs/AuditLogs";
 import Pipeline from "../pages/Pipeline/Pipeline";
-import AllProjects from "../pages/Projects/Projects";
 import RegisterProject from "../pages/RegisterProject/RegisterProject";
 import VersionHistory from "../pages/VersionHistory/VersionHistory";
 import MarketPlace from "../pages/Marketplace/Marketplace";
@@ -37,7 +36,7 @@ export const AppRouter = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/main-dashboard" element={<MainDashboard />} />
           <Route path="/projects" element={<Projects />} />
-          <Route path="/all-projects" element={<AllProjects />} />
+          <Route path="/all-projects" element={<Projects />} />
           <Route path="/register-project" element={<RegisterProject />} />
           <Route path="/deployments" element={<Deployments />} />
           <Route path="/marketplace" element={<MarketPlace />} />

@@ -1,4 +1,4 @@
-import type { FileUploadState } from '../Pipeline';
+import type { FileUploadState } from '../types';
 import { Skeleton } from '../../../Components/Skeleton';
 
 interface Props {

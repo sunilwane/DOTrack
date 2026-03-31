@@ -1,4 +1,6 @@
 import { tokenStorage } from './tokenStorage';
+import { ApiError } from '../utils/errorHandler';
+import { logger } from '../utils/logger';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
@@ -70,7 +72,9 @@ export const apiRequest = async <T>(
   });
 
   if (!response.ok) {
-    throw new Error(await extractErrorMessage(response));
+    const errorMessage = await extractErrorMessage(response);
+    logger.warn('API request failed', { path, status: response.status, message: errorMessage });
+    throw new ApiError(errorMessage, response.status);
   }
 
   if (response.status === 204) {

@@ -1,14 +1,19 @@
 import * as React from "react";
-import { Folder, Link as LinkIcon, Calendar, ChevronDown, RefreshCw } from "lucide-react";
+import { Folder, Link as LinkIcon, Calendar, ChevronDown, RefreshCw, Check } from "lucide-react";
+import { useToggle } from "../../hooks";
 
-import { Check } from "lucide-react";
+interface MiniCheckboxProps {
+    label: string;
+    defaultSelected?: boolean;
+}
 
-const MiniCheckbox: React.FC<{ label: string; defaultSelected?: boolean }> = ({ label, defaultSelected = false }) => {
-    const [isSelected, setIsSelected] = React.useState(defaultSelected);
+const MiniCheckbox: React.FC<MiniCheckboxProps> = ({ label, defaultSelected = false }) => {
+    const [isSelected, toggle] = useToggle(defaultSelected);
+    
     return (
         <div
             className="flex items-center gap-1.5 cursor-pointer group"
-            onClick={() => setIsSelected(!isSelected)}
+            onClick={toggle}
         >
             <div className={`
                 size-3 rounded-[3px] flex items-center justify-center transition-all border

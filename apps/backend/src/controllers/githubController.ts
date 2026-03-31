@@ -1,102 +1,76 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import UserModel from '../models/user.model';
-import { requestJson, ExternalApiError } from '../services/httpService';
-
-const GITHUB_API = 'https://api.github.com';
+import { githubService } from '../services/githubService';
+import { asyncHandler } from '../utils/asyncHandler';
+import { ExternalApiError } from '../services/httpService';
 
 async function resolveAccessToken(req: Request): Promise<string | undefined> {
-  try {
-    const payload = (req as any).user as any;
-    if (payload?.sub) {
-      const user = await UserModel.findById(payload.sub).lean();
-      if (user && (user as any).githubAccessToken) return (user as any).githubAccessToken;
-    }
-  } catch (err) {
-    // ignore and fallback to app token
+  const payload = (req as any).user;
+  if (payload?.sub) {
+    const user = await UserModel.findById(payload.sub).lean();
+    if (user && (user as any).githubAccessToken) return (user as any).githubAccessToken;
   }
-
-  return process.env.GITHUB_APP_TOKEN || undefined;
+  return process.env.GITHUB_APP_TOKEN;
 }
 
-function buildHeaders(token?: string) {
-  const h: any = { Accept: 'application/vnd.github.v3+json' };
-  if (token) h.Authorization = `token ${token}`;
-  return h;
-}
-
-export const getBranches = async (req: Request, res: Response, next: NextFunction) => {
+export const getBranches = asyncHandler(async (req: Request, res: Response) => {
   const { owner, repo } = req.params;
-  try {
-    const token = await resolveAccessToken(req);
-    const url = `${GITHUB_API}/repos/${owner}/${repo}/branches`;
-    const branches = await requestJson<any[]>(url, { headers: buildHeaders(token) }, 'Failed to fetch branches');
-    const result = branches.map((b) => ({ name: b.name, commit: b.commit?.sha }));
-    res.json({ branches: result });
-  } catch (err: any) {
-    if (err instanceof ExternalApiError) return res.status(err.status).json({ error: err.message });
-    next(err);
-  }
-};
+  const ownerStr = Array.isArray(owner) ? owner[0] : owner;
+  const repoStr = Array.isArray(repo) ? repo[0] : repo;
 
-export const getTree = async (req: Request, res: Response, next: NextFunction) => {
+  const token = await resolveAccessToken(req);
+  const branches = await githubService.getRepoBranches(token || '', ownerStr, repoStr);
+  const result = branches.map((b) => ({ name: b.name, commit: b.commit?.sha }));
+  res.json({ branches: result });
+});
+
+export const getTree = asyncHandler(async (req: Request, res: Response) => {
   const { owner, repo } = req.params;
+  const ownerStr = Array.isArray(owner) ? owner[0] : owner;
+  const repoStr = Array.isArray(repo) ? repo[0] : repo;
+
   const ref = typeof req.query.ref === 'string' ? req.query.ref.trim() : '';
   const path = (req.query.path as string) || '';
-  try {
-    const token = await resolveAccessToken(req);
-    const encodedPath = path ? `/${encodeURIComponent(path)}` : '';
-    const refQuery = ref ? `?ref=${encodeURIComponent(ref)}` : '';
-    const url = `${GITHUB_API}/repos/${owner}/${repo}/contents${encodedPath}${refQuery}`;
-    const result = await requestJson<any>(url, { headers: buildHeaders(token) }, 'Failed to fetch tree');
 
-    // If folder, GitHub returns array
+  const token = await resolveAccessToken(req);
+  try {
+    const result = await githubService.getRepoTree(token || '', ownerStr, repoStr, path, ref);
+
     if (Array.isArray(result)) {
-      const entries = result.map((e) => ({
-        name: e.name,
-        path: e.path,
-        type: e.type, // 'file' | 'dir'
-        size: e.size,
-        sha: e.sha,
-      }));
-      return res.json({ entries, branch: ref || undefined });
+      return res.json({ entries: result, branch: ref || undefined });
     }
 
-    // If file was requested
-    if (result.type === 'file') {
-      return res.json({ entries: [], file: { name: result.name, path: result.path, type: 'file', size: result.size, sha: result.sha } });
+    if (result && typeof result === 'object' && 'sha' in result) {
+      return res.json({ entries: [], file: result });
     }
 
-    return res.json({ entries: [] });
+    res.json({ entries: [] });
   } catch (err: any) {
-    if (err instanceof ExternalApiError) {
-      if (err.status === 404) return res.status(404).json({ entries: [] });
-      return res.status(err.status).json({ error: err.message });
+    if (err instanceof ExternalApiError && err.status === 404) {
+      return res.status(404).json({ entries: [] });
     }
-    next(err);
+    throw err;
   }
-};
+});
 
-export const getFile = async (req: Request, res: Response, next: NextFunction) => {
+export const getFile = asyncHandler(async (req: Request, res: Response) => {
   const { owner, repo } = req.params;
+  const ownerStr = Array.isArray(owner) ? owner[0] : owner;
+  const repoStr = Array.isArray(repo) ? repo[0] : repo;
+
   const ref = typeof req.query.ref === 'string' ? req.query.ref.trim() : '';
   const path = (req.query.path as string) || '';
+
   if (!path) return res.status(400).json({ error: 'Missing path' });
 
-  try {
-    const token = await resolveAccessToken(req);
-    const encodedPath = `/${encodeURIComponent(path)}`;
-    const refQuery = ref ? `?ref=${encodeURIComponent(ref)}` : '';
-    const url = `${GITHUB_API}/repos/${owner}/${repo}/contents${encodedPath}${refQuery}`;
-    const result = await requestJson<any>(url, { headers: buildHeaders(token) }, 'Failed to fetch file');
+  const token = await resolveAccessToken(req);
+  const result = await githubService.getRepoTree(token || '', ownerStr, repoStr, path, ref);
 
-    if (result.type !== 'file') return res.status(400).json({ error: 'Path is not a file' });
-
-    const content = result.content ? Buffer.from(result.content, result.encoding || 'base64').toString('utf8') : null;
-    res.json({ file: { name: result.name, path: result.path, sha: result.sha, size: result.size, content, encoding: result.encoding } });
-  } catch (err: any) {
-    if (err instanceof ExternalApiError) return res.status(err.status).json({ error: err.message });
-    next(err);
+  if (!result || Array.isArray(result)) {
+    return res.status(400).json({ error: 'Path is not a file' });
   }
-};
+
+  res.json({ file: result });
+});
 
 export default { getBranches, getTree, getFile };

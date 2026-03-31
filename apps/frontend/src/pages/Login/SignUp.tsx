@@ -1,18 +1,21 @@
 import * as React from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthLayout } from "../../Components/layout/AuthLayout";
-import { Button } from "../../Components/common/Button";
-import { Input } from "../../Components/common/Input";
-import { SocialAuth } from "../../Components/common/SocialAuth";
-import { Divider } from "../../Components/common/Divider";
+import { Button, Divider, FormError, Input, LoadingSpinner, SocialAuth } from "../../Components/common";
 import { useAuth } from "../../contexts/AuthContext";
+import { useFormSubmit } from "../../hooks";
 import { SignUpFields } from "../../mock/PagesMockData/AuthData";
 
 const SignUp: React.FC = () => {
     const navigate = useNavigate();
     const { signup, isAuthenticated, isLoading } = useAuth();
-    const [error, setError] = React.useState<string | null>(null);
-    const [loading, setLoading] = React.useState(false);
+
+    const { handleSubmit: submitForm, loading, error, clearError } = useFormSubmit(
+        async (data: { name: string; email: string; password: string }) => {
+            await signup(data);
+            navigate('/login');
+        }
+    );
 
     React.useEffect(() => {
         if (!isLoading && isAuthenticated) {
@@ -21,20 +24,12 @@ const SignUp: React.FC = () => {
     }, [isAuthenticated, isLoading, navigate]);
 
     if (isLoading) {
-        return (
-            <div className="flex items-center justify-center h-screen bg-background-light dark:bg-background-dark">
-                <div className="text-center">
-                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                    <p className="mt-4 text-slate-600 dark:text-slate-400">Loading...</p>
-                </div>
-            </div>
-        );
+        return <LoadingSpinner fullScreen message="Loading..." />;
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError(null);
-        setLoading(true);
+        clearError();
 
         const formData = new FormData(e.target as HTMLFormElement);
         const name = formData.get('name') as string;
@@ -42,12 +37,9 @@ const SignUp: React.FC = () => {
         const password = formData.get('password') as string;
 
         try {
-            await signup({ name, email, password });
-            navigate('/login');
-        } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'Sign up failed. Please try again.');
-        } finally {
-            setLoading(false);
+            await submitForm({ name, email, password });
+        } catch {
+            // Error is handled by useFormSubmit
         }
     };
 
@@ -62,11 +54,8 @@ const SignUp: React.FC = () => {
             <Divider>or use email</Divider>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
-                {error && (
-                    <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-                        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-                    </div>
-                )}
+                <FormError error={error} />
+                
                 {SignUpFields.map((field, index) => (
                     <Input
                         key={index}

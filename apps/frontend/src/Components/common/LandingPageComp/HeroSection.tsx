@@ -3,6 +3,7 @@ import { Card, CardBody } from "@heroui/react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../Button";
 import { HeroTerminalLogs } from "../../../mock/PagesMockData/LandingData";
+import { ROUTES } from "../../../constants";
 
 export const HeroSection: React.FC = () => {
     const navigate = useNavigate();
@@ -29,7 +30,7 @@ export const HeroSection: React.FC = () => {
                     <Button
                         size="xl"
                         className="w-full sm:min-w-[200px] hover:scale-105"
-                        onClick={() => navigate("/connect")}
+                        onClick={() => navigate(ROUTES.CONNECT_WALLET)}
                     >
                         Connect Wallet
                     </Button>
@@ -37,6 +38,7 @@ export const HeroSection: React.FC = () => {
                         variant="outline"
                         size="xl"
                         className="w-full sm:min-w-[200px] backdrop-blur-md"
+                        onClick={() => navigate(ROUTES.MARKETPLACE)}
                     >
                         Explore Marketplace
                     </Button>
