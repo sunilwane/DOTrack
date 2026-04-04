@@ -1,5 +1,7 @@
 const trimTrailingSlash = (value: string): string => value.trim().replace(/\/+$/, '');
 
+export const DEFAULT_FRONTEND_ORIGIN = 'https://imaginative-otter-9fa0f4.netlify.app';
+
 export const normalizeOrigin = (value: string): string => {
   const trimmed = trimTrailingSlash(value);
   if (!trimmed) return '';
