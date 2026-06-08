@@ -261,3 +261,94 @@ html {
   scrollbar-width: thin;
   scrollbar-color: #334155 transparent;
 }
+
+.project-viewer-code-panel {
+  /* overflow-x: auto; */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: auto;
+  scrollbar-color: #475569 #1e293b;
+  min-width: 0;
+  min-height: 0;
+}
+
+.project-viewer-code-panel::-webkit-scrollbar {
+  width: 8px;
+  height: 10px;
+}
+
+.project-viewer-code-panel::-webkit-scrollbar-track {
+  background: #1e293b;
+  border-radius: 5px;
+}
+
+.project-viewer-code-panel::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 5px;
+}
+
+.project-viewer-code-panel::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+.project-viewer-code {
+  display: block;
+  width: max-content;
+  min-width: 100%;
+  min-height: 100%;
+  background: #1e1e1e;
+}
+
+.project-viewer-code-content {
+  display: block;
+  width: max-content;
+  min-width: 100%;
+  min-height: 100%;
+}
+
+.project-viewer-code pre.shiki {
+  margin: 0 !important;
+  padding: 0.75rem 1rem;
+  border-radius: 0;
+  border: none;
+  font-size: 12px !important;
+  line-height: 1.35 !important;
+  display: block;
+  width: max-content;
+  min-width: 100%;
+  max-width: none !important;
+  min-height: 100%;
+  white-space: pre !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+}
+
+.project-viewer-code pre.shiki code {
+  display: block;
+  width: max-content;
+  min-width: 100%;
+  white-space: pre !important;
+  counter-reset: line;
+  max-width: 100vh;
+  overflow: auto;
+}
+
+.project-viewer-code pre.shiki .line {
+  display: block;
+  width: max-content;
+  white-space: pre !important;
+  line-height: 1.35 !important;
+}
+
+.project-viewer-code pre.shiki .line::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  width: 4ch;
+  margin-right: 1rem;
+  color: #64748b;
+  text-align: right;
+  user-select: none;
+}
+

@@ -1,6 +1,17 @@
 import { Router } from 'express';
-import { signup, signin, signout, refresh } from '../controllers/authController';
-import { me, googleAuth, googleCallback, githubAuth, githubCallback, getGithubRepos, getGithubCollaborators } from '../controllers/authController';
+import {
+  signup,
+  signin,
+  signout,
+  refresh,
+  me,
+  googleAuth,
+  googleCallback,
+  githubAuth,
+  githubCallback,
+  getGithubRepos,
+  getGithubCollaborators,
+} from '../controllers/authController';
 import { requireAuth } from '../middlewares/authMiddleware';
 
 const router = Router();

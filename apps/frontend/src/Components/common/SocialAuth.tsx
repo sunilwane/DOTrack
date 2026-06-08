@@ -1,36 +1,29 @@
 import * as React from "react";
-import { Button } from "../common/Button";
 import { GitHubIcon, GoogleIcon } from "../icons";
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+import { oauthService } from "../../services/oauthService";
 
 export const SocialAuth: React.FC = () => {
   const returnTo =
     typeof window !== "undefined" ? window.location.pathname : "/";
-  const googleHref = `${API_BASE_URL}/api/auth/google?returnTo=${encodeURIComponent(returnTo)}`;
-  const githubHref = `${API_BASE_URL}/api/auth/github?returnTo=${encodeURIComponent(returnTo)}`;
-  return (
-         <div className="flex flex-col gap-3 mb-8">
-            <a href={githubHref} className="block">
-                <Button
-                 variant="social"
-                 className="w-full"
-                  icon={<GitHubIcon className="size-5" />}
-             >
-                Continue with GitHub
-                 </Button>
-              </a>
+  const googleHref = oauthService.getGoogleAuthUrl(returnTo);
+  const githubHref = oauthService.getGithubAuthUrl(returnTo);
 
-            <a href={googleHref} className="block">
-              <Button
-               variant="social"
-               className="w-full"
-               icon={<GoogleIcon className="size-5" />}
-              >
-                Continue with Google
-             </Button>
-             </a>
-         </div>
+  const linkClassName =
+    "inline-flex w-full items-center justify-center rounded-lg border border-slate-200 dark:border-slate-800 " +
+    "bg-white dark:bg-white/5 px-5 py-3 text-sm font-medium text-slate-900 dark:text-white " +
+    "transition-all hover:bg-slate-50 dark:hover:bg-white/10 active:scale-95";
+
+  return (
+    <div className="mb-8 flex flex-col gap-3">
+      <a href={githubHref} className={linkClassName}>
+        <GitHubIcon className="mr-2 size-5" />
+        Continue with GitHub
+      </a>
+
+      <a href={googleHref} className={linkClassName}>
+        <GoogleIcon className="mr-2 size-5" />
+        Continue with Google
+      </a>
+    </div>
   );
 };

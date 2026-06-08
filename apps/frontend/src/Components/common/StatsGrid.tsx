@@ -1,5 +1,5 @@
-import * as React from "react";
 import { Card, CardBody, Chip } from "@heroui/react";
+import { Skeleton } from "../Skeleton";
 
 export interface StatItem {
     label: string;
@@ -11,9 +11,10 @@ export interface StatItem {
 
 interface StatsGridProps {
     stats: StatItem[];
+    isLoading?: boolean;
 }
 
-const StatsGrid = ({ stats }: StatsGridProps) => {
+const StatsGrid = ({ stats, isLoading }: StatsGridProps) => {
     const getChipClass = (type?: string) => {
         switch (type) {
             case "success":
@@ -32,24 +33,32 @@ const StatsGrid = ({ stats }: StatsGridProps) => {
                 <Card key={index} className="bg-nexus-card border border-nexus-border shadow-none" radius="none">
                     <CardBody className="flex-row justify-between items-start p-4">
                         <div className="space-y-1">
-                            <p className="text-gray-400 text-sm">
-                                {stat.label}
-                            </p>
+                            <Skeleton isLoaded={!isLoading} width="80px" height="16px">
+                                <p className="text-gray-400 text-sm">
+                                    {stat.label}
+                                </p>
+                            </Skeleton>
                             <div className="flex items-center gap-3 mt-2">
-                                <span className="text-2xl font-bold">{stat.value}</span>
-                                <Chip
-                                    size="sm"
-                                    variant="flat"
-                                    className={`${getChipClass(stat.chipType)} h-5 text-[10px] px-1 min-w-0`}
-                                >
-                                    {stat.chipText}
-                                </Chip>
+                                <Skeleton isLoaded={!isLoading} width="60px" height="32px">
+                                    <span className="text-2xl font-bold">{stat.value}</span>
+                                </Skeleton>
+                                <Skeleton isLoaded={!isLoading} width="50px" height="20px">
+                                    <Chip
+                                        size="sm"
+                                        variant="flat"
+                                        className={`${getChipClass(stat.chipType)} h-5 text-[10px] px-1 min-w-0`}
+                                    >
+                                        {stat.chipText}
+                                    </Chip>
+                                </Skeleton>
                             </div>
                         </div>
                         {stat.icon && (
-                            <div className="text-white/10 mt-1">
-                                {stat.icon}
-                            </div>
+                            <Skeleton isLoaded={!isLoading} width="40px" height="40px">
+                                <div className="text-white/10 mt-1">
+                                    {stat.icon}
+                                </div>
+                            </Skeleton>
                         )}
                     </CardBody>
                 </Card>

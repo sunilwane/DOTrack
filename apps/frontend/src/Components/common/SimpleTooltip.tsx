@@ -1,17 +1,15 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
+import { useToggle } from "../../hooks";
 
 export type TooltipPlacement = "top" | "bottom" | "left" | "right";
 
 interface SimpleTooltipProps {
-   
     label: React.ReactNode;
-    
     placement?: TooltipPlacement;
-   
     delay?: number;
-    
     className?: string;
+    style?: React.CSSProperties;
     children: React.ReactElement;
 }
 
@@ -44,9 +42,10 @@ export const SimpleTooltip: React.FC<SimpleTooltipProps> = ({
     placement = "right",
     delay = 0,
     className = "",
+    style,
     children,
 }) => {
-    const [isVisible, setIsVisible] = React.useState(false);
+    const [isVisible, , show, hide] = useToggle(false);
     const triggerRef = React.useRef<HTMLDivElement>(null);
     const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
     const [position, setPosition] = React.useState<React.CSSProperties>({});
@@ -57,9 +56,9 @@ export const SimpleTooltip: React.FC<SimpleTooltipProps> = ({
             setPosition(getTooltipPosition(rect, placement));
         }
         if (delay > 0) {
-            timeoutRef.current = setTimeout(() => setIsVisible(true), delay);
+            timeoutRef.current = setTimeout(show, delay);
         } else {
-            setIsVisible(true);
+            show();
         }
     };
 
@@ -68,7 +67,7 @@ export const SimpleTooltip: React.FC<SimpleTooltipProps> = ({
             clearTimeout(timeoutRef.current);
             timeoutRef.current = null;
         }
-        setIsVisible(false);
+        hide();
     };
 
     React.useEffect(() => {
@@ -81,6 +80,7 @@ export const SimpleTooltip: React.FC<SimpleTooltipProps> = ({
         <div
             ref={triggerRef}
             className={`inline-block ${className}`}
+            style={style}
             onMouseEnter={showTooltip}
             onMouseLeave={hideTooltip}
         >

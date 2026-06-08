@@ -2,7 +2,6 @@ import { CookieOptions } from 'express';
 
 export const getRefreshCookieOptions = (): CookieOptions => {
   const isProd = process.env.NODE_ENV === 'production';
-  const frontend = process.env.FRONTEND_URL || 'http://localhost:3000';
   return {
     httpOnly: true,
     secure: isProd,
