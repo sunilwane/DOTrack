@@ -8,7 +8,11 @@ import * as UserService from '../services/user.service';
 import * as TokenService from '../services/token.service';
 import { githubService } from '../services/githubService';
 import { oauthService } from '../services/oauthService';
-import { normalizeFrontendBaseUrl, normalizeReturnToPath } from '../utils/origin';
+import {
+  DEFAULT_FRONTEND_ORIGIN,
+  normalizeFrontendBaseUrl,
+  normalizeReturnToPath,
+} from '../utils/origin';
 import jwt from 'jsonwebtoken';
 
 export const signup = asyncHandler(async (req: Request, res: Response) => {
@@ -84,7 +88,7 @@ export const googleCallback = asyncHandler(async (req: Request, res: Response) =
   if (!code) return res.status(400).json({ error: 'Missing code' });
 
   const state = req.query.state as string | undefined;
-  const frontend = normalizeFrontendBaseUrl(process.env.FRONTEND_URL, 'http://localhost:3000');
+  const frontend = normalizeFrontendBaseUrl(process.env.FRONTEND_URL, DEFAULT_FRONTEND_ORIGIN);
 
   const tokenData = await oauthService.exchangeGoogleCode(
     {
@@ -119,7 +123,7 @@ export const githubCallback = asyncHandler(async (req: Request, res: Response) =
   if (!code) return res.status(400).json({ error: 'Missing code' });
 
   const state = req.query.state as string | undefined;
-  const frontend = normalizeFrontendBaseUrl(process.env.FRONTEND_URL, 'http://localhost:3000');
+  const frontend = normalizeFrontendBaseUrl(process.env.FRONTEND_URL, DEFAULT_FRONTEND_ORIGIN);
 
   const tokenData = await oauthService.exchangeGithubCode(
     {

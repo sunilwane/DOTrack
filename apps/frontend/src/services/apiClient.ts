@@ -2,7 +2,9 @@ import { tokenStorage } from './tokenStorage';
 import { ApiError } from '../utils/errorHandler';
 import { logger } from '../utils/logger';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL?.trim().replace(/\/+$/, '') ||
+  (import.meta.env.DEV ? 'http://localhost:5000' : '');
 
 interface ApiRequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';

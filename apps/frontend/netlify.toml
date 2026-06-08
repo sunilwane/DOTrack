@@ -7,6 +7,12 @@ publish = "dist"
 NODE_VERSION = "20"
 
 [[redirects]]
+from = "/api/*"
+to = "https://backend-production-0dbd.up.railway.app/api/:splat"
+status = 200
+force = true
+
+[[redirects]]
 from = "/*"
 to = "/index.html"
 status = 200
