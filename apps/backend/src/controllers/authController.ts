@@ -124,35 +124,40 @@ export const githubCallback = asyncHandler(async (req: Request, res: Response) =
 
   const state = req.query.state as string | undefined;
   const frontend = normalizeFrontendBaseUrl(process.env.FRONTEND_URL, DEFAULT_FRONTEND_ORIGIN);
-
-  const tokenData = await oauthService.exchangeGithubCode(
-    {
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-      callbackUrl: process.env.GITHUB_CALLBACK_URL!,
-    },
-    code
-  );
-
-  let email = await githubService.getUserPrimaryEmail(tokenData.access_token);
-  const userInfo = await githubService.getUserInfo(tokenData.access_token);
-
-  if (!email) email = userInfo.email;
-  if (!email) throw new Error('No email found for GitHub user');
-
-  const user = await AuthService.findOrCreateUserByGithub(
-    email,
-    userInfo.name || userInfo.login,
-    String(userInfo.id),
-    userInfo.login,
-    tokenData.access_token
-  );
-
-  const tokens = await AuthService.createTokensForUser(user);
-  res.cookie('refreshToken', tokens.refreshToken, getRefreshCookieOptions());
-
   const { returnTo } = oauthService.parseState(state);
-  res.redirect(`${frontend}${normalizeReturnToPath(returnTo)}`);
+
+  try {
+    const tokenData = await oauthService.exchangeGithubCode(
+      {
+        clientId: process.env.GITHUB_CLIENT_ID!,
+        clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+        callbackUrl: process.env.GITHUB_CALLBACK_URL!,
+      },
+      code
+    );
+
+    let email = await githubService.getUserPrimaryEmail(tokenData.access_token);
+    const userInfo = await githubService.getUserInfo(tokenData.access_token);
+
+    if (!email) email = userInfo.email;
+    if (!email) throw new Error('No email found for GitHub user');
+
+    const user = await AuthService.findOrCreateUserByGithub(
+      email,
+      userInfo.name || userInfo.login,
+      String(userInfo.id),
+      userInfo.login,
+      tokenData.access_token
+    );
+
+    const tokens = await AuthService.createTokensForUser(user);
+    res.cookie('refreshToken', tokens.refreshToken, getRefreshCookieOptions());
+
+    res.redirect(`${frontend}${normalizeReturnToPath(returnTo)}`);
+  } catch (error) {
+    console.error('GitHub OAuth callback failed', error);
+    res.redirect(`${frontend}/login?auth=github_failed`);
+  }
 });
 
 export const getGithubRepos = asyncHandler(async (req: AuthRequest, res: Response) => {

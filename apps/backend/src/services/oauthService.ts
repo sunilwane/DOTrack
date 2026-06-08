@@ -51,17 +51,21 @@ export class OAuthService {
   }
 
   async exchangeGithubCode(config: OAuthConfig, code: string): Promise<any> {
+    const params = new URLSearchParams();
+    params.append('client_id', config.clientId);
+    params.append('client_secret', config.clientSecret);
+    params.append('code', code);
+    params.append('redirect_uri', config.callbackUrl);
+
     return requestJson<any>(
       'https://github.com/login/oauth/access_token',
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          client_id: config.clientId,
-          client_secret: config.clientSecret,
-          code,
-          redirect_uri: config.callbackUrl,
-        }),
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Accept: 'application/json',
+        },
+        body: params.toString(),
       },
       'Failed to exchange GitHub code for token'
     );
