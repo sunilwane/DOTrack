@@ -4,6 +4,8 @@ import { useRepoState } from '../../../contexts/useRepoState';
 import BranchSelector from './BranchSelector';
 import CodeViewer from './CodeViewer';
 import FileExplorer from './FileExplorer';
+import ProjectChatPanel from './ProjectChatPanel';
+import { MessageSquareText } from 'lucide-react';
 
 const ProjectViewerContent = () => {
   const params = useParams<{ owner?: string; repo?: string }>();
@@ -16,6 +18,7 @@ const ProjectViewerContent = () => {
   const previousBranch = state.branch;
   const [sidebarWidth, setSidebarWidth] = useState(320);
   const [isResizing, setIsResizing] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const resizeStateRef = useRef<{ startX: number; startWidth: number } | null>(null);
 
   useEffect(() => {
@@ -82,7 +85,7 @@ const ProjectViewerContent = () => {
   };
 
   return (
-    <div className="flex flex-col h-full min-h-0 overflow-hidden">
+    <div className="relative flex h-full min-h-0 flex-col overflow-hidden">
       <header className="h-16 shrink-0 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0a0a0a] flex items-center justify-between px-6 z-10">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
@@ -91,6 +94,15 @@ const ProjectViewerContent = () => {
           </div>
           <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-2" />
           <BranchSelector owner={owner} repo={repo} currentBranch={ref} />
+          <button
+            type="button"
+            onClick={() => setIsChatOpen((current) => !current)}
+            className="ml-1 inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-cyan-400/40 hover:bg-cyan-50 hover:text-cyan-700 dark:border-slate-700 dark:bg-[#111827] dark:text-slate-200 dark:hover:border-cyan-500/40 dark:hover:bg-cyan-500/10 dark:hover:text-cyan-200"
+            aria-pressed={isChatOpen}
+          >
+            <MessageSquareText className="h-4 w-4" />
+            Team Chat
+          </button>
         </div>
       </header>
       <div className="flex flex-1 min-h-0 min-w-0 overflow-hidden">
@@ -106,6 +118,13 @@ const ProjectViewerContent = () => {
         />
         <CodeViewer />
       </div>
+      <ProjectChatPanel
+        owner={owner}
+        repo={repo}
+        currentBranch={ref}
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+      />
     </div>
   );
 };

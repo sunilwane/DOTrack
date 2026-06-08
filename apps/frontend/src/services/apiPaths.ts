@@ -11,4 +11,12 @@ export const apiPaths = {
     githubCollaborators: (owner: string, repo: string) =>
       `/api/auth/github/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/collaborators`,
   },
+  chat: {
+    me: '/api/chat/me',
+    workspace: '/api/chat/workspace',
+    channels: '/api/chat/channels',
+    members: '/api/chat/members',
+    messages: (channelId: string) => `/api/chat/channels/${encodeURIComponent(channelId)}/messages`,
+    projectMessages: (roomId: string) => `/api/chat/rooms/${encodeURIComponent(roomId)}/messages`,
+  },
 } as const;
